@@ -1,0 +1,8 @@
+.npmignore
+src
+.eslintignore
+.eslintrc
+.prettierignore
+.prettierrc
+babel.config.js
+.gitignore

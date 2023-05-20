@@ -1,0 +1,57 @@
+declare module '@liph/util' {
+    export type TError = {
+        title: string
+        message: { message: string, origin?: string }[]
+    }
+
+    export declare class ErrorGeneral implements TError {
+        title: string
+        message: {
+            message: string;
+            origin?: string;
+        }[]
+        constructor({ message, title }: TError);
+    }
+
+    export const randomId = {
+        int: () => number,
+        uuidv4: () => string
+    }
+
+    export type TObserver = { handler: <T>(data: T) => void, type: string, code: number, }
+
+    export function ObserverEvent(): {
+        registerEvent: (
+            observer: { handler: <T>(data: T) => void; type: string }
+        ) => number;
+        dispareEvent: <T>(params: { data: T; type: string }) => void;
+    };
+
+    export const hash = {
+        generate: (text: string) => Promise<string>,
+        compare: (hash: string, ref: string) => Promise<boolean>,
+    }
+
+
+    export declare class Result<T> {
+        private ok
+        private status
+        private value?
+        private error?
+        private constructor();
+        static failure<T>(errorInfo: TError, statusCode: number): Result<T>;
+        static success<T>(successInfo: T, statusCode?: number): Result<T>;
+        isSuccess(): boolean;
+        getResponse(): T;
+        getError(): ErrorGeneral;
+        getStatus(): number;
+        getResult(): {
+            ok: boolean;
+            status: number;
+            value: T | undefined;
+            error: ErrorGeneral | undefined;
+        };
+    }
+
+    export function getEnv<T>(args: { name: string, default?: T, forceDefault?: boolean, production?: boolean }): string | NonNullable<T>
+}

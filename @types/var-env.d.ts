@@ -1,0 +1,1 @@
+export function getEnv<T>(args: { name: string, default?: T, forceDefault?: boolean, production?: boolean }): string | NonNullable<T>
