@@ -14,5 +14,6 @@ module.exports = {
         '**/*.spec.ts',
         '**/*.test.ts',
         '**/*.d.ts',
+        './public',
     ]
 }
