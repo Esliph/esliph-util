@@ -4,13 +4,12 @@
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
-    "private": false,
     "scripts": {
         "start": "node dist/index.js",
         "dev": "tsx watch src/index.ts",
         "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
         "build": "npx tsup src",
-        "test": "vitest",
+        "test": "npx watch @tests/index.ts",
         "valid:lint": "eslint \"**/*.ts\"",
         "fix:lint": "eslint --fix ."
     },
@@ -20,7 +19,6 @@
     "keywords": [],
     "author": "",
     "license": "MIT",
-    "homepage": "https://github.com/Danrley-Ruan-Saquetti/util#readme",
     "devDependencies": {
         "@babel/cli": "^7.21.5",
         "@babel/core": "^7.21.8",
@@ -38,8 +36,7 @@
         "eslint-config-prettier": "^8.8.0",
         "prettier": "^2.8.8",
         "tsx": "^3.12.7",
-        "typescript": "^5.0.4",
-        "vitest": "^0.31.0"
+        "typescript": "^5.0.4"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",

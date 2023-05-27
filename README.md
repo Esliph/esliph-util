@@ -1,4 +1,4 @@
-# @esliph/util
+# @liph/util
 
 Este é um pacote npm que disponibiliza funções utilitárias para projetos node.
 
@@ -6,7 +6,7 @@ Este é um pacote npm que disponibiliza funções utilitárias para projetos nod
 
 Rode o seguinte comando em seu terminal para instalar o pacote
 
-`npm i @esliph/util`
+`npm i @liph/util`
 
 E para usa-lo, basta importar em seu código, como no exemplo:
 
