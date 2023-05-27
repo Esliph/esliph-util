@@ -4,12 +4,6 @@ import { hash } from '@lib/hash'
 import { ObserverEvent } from '@lib/observer'
 import { Result } from '@lib/result'
 import { getEnv } from '@lib/var-env'
+import { getAllFlags, getFlag } from '@lib/flag-node'
 
-export {
-    ErrorGeneral,
-    randomId,
-    hash,
-    ObserverEvent,
-    Result,
-    getEnv,
-}
+export { ErrorGeneral, randomId, hash, ObserverEvent, Result, getEnv, getAllFlags, getFlag }
