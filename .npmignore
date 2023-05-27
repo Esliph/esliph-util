@@ -6,3 +6,4 @@ src
 .prettierrc
 babel.config.js
 .gitignore
+public

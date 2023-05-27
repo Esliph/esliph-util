@@ -1,9 +1,10 @@
 {
-    "name": "@liph/util",
-    "version": "1.0.0",
+    "name": "@esliph/util",
+    "version": "1.0.1",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
+    "private": false,
     "scripts": {
         "start": "node dist/index.js",
         "dev": "tsx watch src/index.ts",
