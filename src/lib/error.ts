@@ -1,4 +1,4 @@
-import { TError } from "@@types/error"
+import { TError } from '@esliph/util'
 
 export class ErrorGeneral implements TError {
     title: string

@@ -5,11 +5,8 @@ declare module '@esliph/util' {
     }
 
     export declare class ErrorGeneral implements TError {
-        title: string
-        message: {
-            message: string
-            origin?: string
-        }[]
+        title: TError['title']
+        message: TError['message']
         constructor({ message, title }: TError)
     }
 
@@ -45,8 +42,8 @@ declare module '@esliph/util' {
         getResult(): {
             ok: boolean
             status: number
-            value: T | undefined
-            error: ErrorGeneral | undefined
+            value: T
+            error: ErrorGeneral
         }
     }
 

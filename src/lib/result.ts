@@ -1,18 +1,13 @@
-import { TError } from '@@types/error'
+import { TError } from '@esliph/util'
 import { ErrorGeneral } from '@lib/error'
 
-export class Result<T> {
+export class Result<T = any> {
     private ok: boolean
     private status: number
     private value?: T
     private error?: ErrorGeneral
 
-    private constructor({
-        ok,
-        status,
-        value,
-        error,
-    }: { ok: true; value: T; status: number; error?: undefined } | { ok: false; error: ErrorGeneral; status: number; value?: undefined }) {
+    private constructor({ ok, status, value, error, }: { ok: true; value: T; status: number; error?: undefined } | { ok: false; error: ErrorGeneral; status: number; value?: undefined }) {
         this.ok = ok
         this.status = status
         if (ok) {
@@ -22,12 +17,12 @@ export class Result<T> {
         }
     }
 
-    static failure<T>(errorInfo: TError, statusCode: number) {
-        return new Result<T>({ ok: false, error: new ErrorGeneral(errorInfo), status: statusCode })
-    }
-
     static success<T>(successInfo: T, statusCode = 200) {
         return new Result<T>({ ok: true, status: statusCode, value: successInfo })
+    }
+
+    static failure<T>(errorInfo: TError, statusCode: number) {
+        return new Result<T>({ ok: false, error: new ErrorGeneral(errorInfo), status: statusCode })
     }
 
     isSuccess() {
@@ -47,6 +42,6 @@ export class Result<T> {
     }
 
     getResult() {
-        return { ok: this.ok, status: this.status, value: this.value, error: this.error }
+        return { ok: this.ok, status: this.status, value: this.value as T, error: this.error as ErrorGeneral }
     }
 }
