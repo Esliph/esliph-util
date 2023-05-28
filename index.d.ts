@@ -52,7 +52,7 @@ declare module '@esliph/util' {
 
     export function getEnv<T>(args: { name: string; default?: T; forceDefault?: boolean; production?: boolean }): string | NonNullable<T>
 
-    export function getFlag(flagName: string): { [x: string]: string }
+    export function getFlag(flagName: string)string
 
     export function getAllFlags(): { [x: string]: string }
 }
