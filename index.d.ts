@@ -54,5 +54,5 @@ declare module '@esliph/util' {
 
     export function getFlag(flagName: string): { [x: string]: string }
 
-    export function getAllFlags(): string
+    export function getAllFlags(): { [x: string]: string }
 }
