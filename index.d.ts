@@ -1,7 +1,7 @@
 declare module '@esliph/util' {
     export type TError = {
         title: string
-        message: { message: string; origin?: string }[]
+        message: { message: string; origin: string }[]
     }
 
     export declare class ErrorGeneral implements TError {
