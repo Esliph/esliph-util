@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util",
-    "version": "1.0.1",
+    "version": "1.0.111",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
@@ -16,6 +16,18 @@
     "repository": {
         "url": "git+https://github.com/Danrley-Ruan-Saquetti/util.git"
     },
+    "exports": {
+        ".": {
+            "require": "./dist/index.js",
+            "import": "./dist/index.js",
+            "types": "./index.d.ts"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "/dist/lib",
+        "/index.d.ts"
+    ],
     "keywords": [],
     "author": "",
     "license": "MIT",

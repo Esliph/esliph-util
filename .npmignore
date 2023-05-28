@@ -7,3 +7,4 @@ src
 babel.config.js
 .gitignore
 public
+tsconfig.json
