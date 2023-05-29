@@ -15,11 +15,12 @@ declare module '@esliph/util' {
         uuidv4: () => string,
     }
 
-    export type TObserver = { handler: <T>(data: T) => void; type: string; code: number }
+    export type TObserver = { handler: <T>(data: T) => void; evt: string; code: number }
 
     export function ObserverEvent(): {
         registerEvent: (observer: { handler: <T>(data: T) => void; type: string }) => number
         dispareEvent: <T>(params: { data: T; type: string }) => void
+        removeListener: (code: number) => void
     }
 
     export const hash = {

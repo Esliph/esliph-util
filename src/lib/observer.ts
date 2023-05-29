@@ -1,26 +1,31 @@
+import { TObserver } from '@esliph/util'
 import { randomId } from '@lib/generate-id'
-import { TObserver } from '@@types/observer'
 
 export function ObserverEvent() {
     const observers: TObserver[] = []
 
-    const registerEvent = (observer: { handler: <T>(data: T) => void, type: string }) => {
+    const on = (evt: string, handler: <T>(data: T) => void) => {
         const code = randomId.int()
-        observers.push({ ...observer, code })
+        observers.push({ evt, handler, code })
 
         return code
     }
 
-    const dispareEvent = <T>({ type, data }: { data: T, type: string }) => {
-        observers.filter(_obs => { return _obs.type == type }).forEach(_obs => {
+    const emit = <T>(evt: string, data: T) => {
+        observers.filter(_obs => { return _obs.evt == evt }).forEach(_obs => {
             setTimeout(() => {
                 _obs.handler({ data })
             }, 1)
         })
     }
 
+    const removeListener = (code: number) => {
+        const evt = observers.find(obs => obs.code == code)
+    }
+
     return {
-        registerEvent,
-        dispareEvent,
+        on,
+        emit,
+        removeListener
     }
 }
