@@ -17,9 +17,9 @@ declare module '@esliph/util' {
 
     export type TObserver = { handler: <T>(data: T) => void; evt: string; code: number }
 
-    export function ObserverEvent(): {
-        on: (observer: { handler: <T>(data: T) => void; type: string }) => number
-        emit: <T>(params: { data: T; type: string }) => void
+    export interface ObserverEvent {
+        on: (evt: string, handler: <T>(data: T) => void) => number
+        emit: <T>(evt: string, data: T) => void
         removeListener: (code: number) => void
     }
 
