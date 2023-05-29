@@ -20,7 +20,11 @@ export function ObserverEvent() {
     }
 
     const removeListener = (code: number) => {
-        const evt = observers.find(obs => obs.code == code)
+        const index = observers.findIndex(obs => obs.code == code)
+
+        if (index < 0) { return }
+
+        observers.splice(index, 1)
     }
 
     return {
