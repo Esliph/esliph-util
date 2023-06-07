@@ -15,17 +15,28 @@ declare module '@esliph/util' {
         uuidv4: () => string,
     }
 
-    export type TObserver = { handler: <T>(data: T) => void; evt: string; code: number }
-
-    export interface ObserverEvent {
-        on: (evt: string, handler: <T>(data: T) => void) => number
-        emit: <T>(evt: string, data: T) => void
-        removeListener: (code: number) => void
+    export interface ObserverEventData {
+        data: IEventData
     }
 
-    export const hash = {
-        generate: (text: string) => Promise<string>,
-        compare: (hash: string, ref: string) => Promise<boolean>,
+    export type ObserverListener<Events> = {
+        handler: (data: IEvent) => void
+        evt: Events
+        code: number
+        main?: boolean
+    }
+
+    export interface ObserverEventModel<Events> {
+        on: <E extends Events>(evt: E, handler: (data: IEvent) => void, main?: boolean) => number
+        emit: <U extends Events>(evt: U, data: IEvent) => void
+        removeListener: (code: number) => void
+        clearListeners: (main?: boolean) => void
+        listeners: ObserverListener<Events>[]
+    }
+
+    export const hash: {
+        generate: (text: string) => Promise<string>
+        compare: (hash: string, ref: string) => Promise<boolean>
     }
 
     export declare class Result<T> {
