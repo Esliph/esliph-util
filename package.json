@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util",
-    "version": "1.0.15",
+    "version": "1.0.151",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",

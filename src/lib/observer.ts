@@ -13,10 +13,12 @@ export function ObserverEvent<Events>(): ObserverEventModel<Events> {
     }
 
     const emit: ObserverEventModel<Events>['emit'] = async <U extends Events>(evt: U, data: ObserverEventData) => {
-        await new Promise(resolve => {
+        /* eslint no-async-promise-executor: ["off"] */
+
+        await new Promise(async (resolve) => {
             const promises = listeners.filter(_obs => _obs.evt == evt).map((_obs) => _obs.handler(data))
 
-            Promise.all(promises).then(resolve)
+            await Promise.all(promises).then(resolve)
         })
     }
 
