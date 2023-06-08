@@ -12,40 +12,31 @@ export function ObserverEvent<Events>(): ObserverEventModel<Events> {
         return code
     }
 
-    const emit: ObserverEventModel<Events>['emit'] = <U extends Events>(evt: U, data: ObserverEventData) => {
-        setTimeout(() => {
-            listeners
-                .filter(_obs => {
-                    return _obs.evt == evt
-                })
-                .forEach(_obs => {
-                    setTimeout(() => _obs.handler(data), 1)
-                })
-        }, 1)
+    const emit: ObserverEventModel<Events>['emit'] = async <U extends Events>(evt: U, data: ObserverEventData) => {
+        await new Promise(resolve => {
+            const promises = listeners.filter(_obs => _obs.evt == evt).map((_obs) => _obs.handler(data))
+
+            Promise.all(promises).then(resolve)
+        })
     }
 
     const removeListener: ObserverEventModel<Events>['removeListener'] = code => {
         const index = listeners.findIndex(obs => obs.code == code)
 
-        if (index < 0) {
-            return
-        }
+        if (index < 0) { return }
 
         listeners.splice(index, 1)
     }
 
     const clearListeners: ObserverEventModel<Events>['clearListeners'] = main => {
+        /* eslint no-unused-expressions: ["off"] */
         for (let i = listeners.length - 1; i >= 0; i--) {
             if (listeners[i].main) {
-                if (main) {
-                    listeners.splice(i, 1)
-                }
+                main && listeners.splice(i, 1)
 
                 continue
             }
-            if (!main) {
-                listeners.splice(i, 1)
-            }
+            !main && listeners.splice(i, 1)
         }
     }
 

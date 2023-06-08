@@ -7,9 +7,3 @@ import { getEnv } from '@lib/var-env'
 import { getAllFlags, getFlag } from '@lib/flag-node'
 
 export { ErrorGeneral, randomId, hash, ObserverEvent, Result, getEnv, getAllFlags, getFlag }
-
-type Events = 'teste1' | 'teste2' | 'teste3' | 'teste4'
-
-const obs = ObserverEvent<Events>()
-
-obs.on('teste1', () => {})

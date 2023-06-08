@@ -28,11 +28,13 @@ declare module '@esliph/util' {
 
     export interface ObserverEventModel<Events> {
         on: <E extends Events>(evt: E, handler: (data: IEvent) => void, main?: boolean) => number
-        emit: <U extends Events>(evt: U, data: IEvent) => void
+        emit: <U extends Events>(evt: U, data: IEvent) => Promise<void>
         removeListener: (code: number) => void
         clearListeners: (main?: boolean) => void
         listeners: ObserverListener<Events>[]
     }
+
+    export function ObserverEvent<Events>(): ObserverEventModel<Events>
 
     export const hash: {
         generate: (text: string) => Promise<string>
