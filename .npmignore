@@ -6,5 +6,6 @@
 babel.config.js
 .gitignore
 tsconfig.json
+node_modules
 public
 src
