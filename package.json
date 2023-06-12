@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util",
-    "version": "1.0.151",
+    "version": "1.0.16",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
@@ -9,7 +9,7 @@
         "start": "node dist/index.js",
         "dev": "tsx watch src/index.ts",
         "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
-        "build": "npx tsup --watch src",
+        "build": "npx tsup src",
         "valid:lint": "eslint \"**/*.ts\"",
         "fix:lint": "eslint --fix ."
     },

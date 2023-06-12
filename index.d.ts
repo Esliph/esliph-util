@@ -66,4 +66,16 @@ declare module '@esliph/util' {
     export function getFlag(flagName: string): string
 
     export function getAllFlags(): { [x: string]: string }
+
+    export type LocalStorageOptions = {
+        inMemory?: boolean
+    }
+
+    export function LocalStorage(options?: LocalStorageOptions): {
+        createItem: (key: string, value: any) => boolean;
+        updateItem: (key: string, value: any) => boolean;
+        removeItem: (key: string) => boolean;
+        getItem: <T>(key: string) => T | null;
+        clear: () => boolean;
+    }
 }
