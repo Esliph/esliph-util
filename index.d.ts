@@ -72,10 +72,79 @@ declare module '@esliph/util' {
     }
 
     export function LocalStorage(options?: LocalStorageOptions): {
-        createItem: (key: string, value: any) => boolean;
-        updateItem: (key: string, value: any) => boolean;
-        removeItem: (key: string) => boolean;
-        getItem: <T>(key: string) => T | null;
-        clear: () => boolean;
+        createItem: (key: string, value: any) => boolean
+        updateItem: (key: string, value: any) => boolean
+        removeItem: (key: string) => boolean
+        getItem: <T>(key: string) => T | null
+        clear: () => boolean
+    }
+
+    export type ConsoleArgument = number | string | boolean | object | any[] | Function | bigint | null | undefined
+    export type ConsoleMethod = 'info' | 'log' | 'error' | 'warn'
+    export type ConsoleConfig = {
+        showDataTime?: boolean
+        pidName?: string
+        showPid?: boolean
+        showPidCode?: boolean
+        showPidName?: boolean
+        levels?: boolean | ConsoleMethod | ConsoleMethod[]
+    }
+
+    export type ColorsTextEnable =
+        | 'default'
+        | 'black'
+        | 'red'
+        | 'redLight'
+        | 'green'
+        | 'greenLight'
+        | 'yellow'
+        | 'yellowLight'
+        | 'blue'
+        | 'blueLight'
+        | 'magenta'
+        | 'magentaLight'
+        | 'cyan'
+        | 'cyanLight'
+        | 'white'
+        | 'grey'
+        | 'greyLight'
+        | 'purple'
+        | 'purpleLight'
+    export type ColorsBackgroundEnable =
+        | 'default'
+        | 'black'
+        | 'blackLight'
+        | 'red'
+        | 'redLight'
+        | 'green'
+        | 'greenLight'
+        | 'yellow'
+        | 'yellowLight'
+        | 'blue'
+        | 'blueLight'
+        | 'magenta'
+        | 'magentaLight'
+        | 'cyan'
+        | 'cyanLight'
+        | 'white'
+        | 'whiteLight'
+        | 'grey'
+        | 'greyLight'
+        | 'purple'
+        | 'purpleLight'
+    export type ColorsTextStyles = 'default' | 'bold' | 'italic' | 'underline' | 'strikethrough'
+    export type ColorsConsoleType = number | string | boolean | object | any[] | Function | bigint | null | undefined
+    export type ColorizeArgs = { color: ColorsTextEnable; background?: ColorsBackgroundEnable; styles?: ColorsTextStyles | ColorsTextStyles[] }
+
+    export declare class Console {
+        constructor(args?: { context?: string; config?: ConsoleConfig; clearMessage?: boolean })
+        getContext(): string | undefined
+        log(message: ConsoleArgument, context?: string): void
+        error(message: ConsoleArgument, context?: string): void
+        warn(message: ConsoleArgument, context?: string): void
+        info(message: ConsoleArgument, context?: string): void
+        colorizeText(text: ColorsConsoleType, args: ColorizeArgs): void
+        clear(): void
+        static clear(): void
     }
 }
