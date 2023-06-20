@@ -1,15 +1,3 @@
-
-const PATTERNS_CODE = {
-    grey: '30',
-    red: '31',
-    green: '32',
-    yellow: '33',
-    blue: '34',
-    purple: '35',
-    white: '37',
-    opaque: '2'
-}
-
 const EnumColorsText = {
     default: '39',
     black: '30',
@@ -93,14 +81,15 @@ function getFullCodes(...codes: CodeType[]) {
 }
 
 function colorize(text: ColorsConsoleType, ...codes: CodeType[]) {
+    const fullCode = getFullCodes(...codes)
 
+    return `${fullCode}${text}${getFullCodes(RESET_TEXT_STYLE)}`
 }
 
 export function colorizeText(text: ColorsConsoleType, { color, background, styles }: { color: ColorsTextEnable, background?: ColorsBackgroundEnable, styles?: ColorsTextStyles | ColorsTextStyles[] }) {
-    let textColored = text
-    if (!isColorAllowed()) { return `${textColored}` }
+    if (!isColorAllowed()) { return `${text}` }
 
-    if (!EnumColorsText[color]) { return `${textColored}` }
+    if (!EnumColorsText[color]) { return `${text}` }
 
     const codeColor = EnumColorsText[color]
     const codeBackground = background ? EnumColorsBackground[background] : ''
@@ -108,14 +97,5 @@ export function colorizeText(text: ColorsConsoleType, { color, background, style
 
     const codes = orderCodes({ color: codeColor, background: codeBackground, styles: codesStyles })
 
-    const fullCode = getFullCodes(...codes)
-
-    return `${fullCode}${textColored}${getFullCodes(RESET_TEXT_STYLE)}`
+    return colorize(text, ...codes)
 }
-
-console.log(colorizeText('Hello World', { color: 'red' }))
-console.log(colorizeText('Hello World', { color: 'red', background: 'redLight' }))
-console.log(colorizeText('Hello World', { color: 'red', styles: ['underline'] }))
-console.log(colorizeText('Hello World', { color: 'red', styles: ['italic'] }))
-console.log(colorizeText('Hello World', { color: 'red', styles: 'bold' }))
-console.log(colorizeText('Hello World', { color: 'red', styles: ['italic', 'strikethrough', 'underline'] }))
