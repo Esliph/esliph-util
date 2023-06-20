@@ -6,13 +6,13 @@ module.exports = {
         ['module-resolver', {
             alias: {
                 '@lib': './src/lib',
-                '@@types': './@types',
+                '@util': './src/util',
             }
         }]
     ],
     ignore: [
-        '**/*.spec.ts',
-        '**/*.test.ts',
+        '**/*spec.ts',
+        '**/*test.ts',
         '**/*.d.ts',
         './public',
     ]
