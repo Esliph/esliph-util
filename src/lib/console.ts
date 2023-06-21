@@ -234,7 +234,7 @@ export class Console {
     }
 
     colorizeText(text: ColorsConsoleType, args: ColorizeArgs) {
-        colorizeText(text, args)
+        return colorizeText(text, args)
     }
 
     private print({
