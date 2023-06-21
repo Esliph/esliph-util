@@ -126,7 +126,7 @@ export class Console {
     }
 
     private getTimestamp(dateTime = new Date(Date.now())): string {
-        return dateTimeFormatter.format(dateTime).replace(', ', ' - ')
+        return dateTimeFormatter.format(dateTime).replace(', ', ' ')
     }
 
     private getColorMessageFormate({
