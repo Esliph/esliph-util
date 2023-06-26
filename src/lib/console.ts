@@ -13,11 +13,6 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     calendar: 'gregory',
 })
 
-const EnumWriteStream = {
-    log: 'stdout',
-    error: 'stderr',
-} as const
-
 const EnumConsoleMethod = {
     info: 'info',
     log: 'log',
@@ -111,14 +106,7 @@ export class Console {
         this.config = { ...DEFAULT_CONFIG }
 
         if (args) {
-            // @ts-expect-error
-            this.config = { ...this.config, ...args.config }
-
-            if (typeof args.levels != 'undefined') {
-                if (typeof args.levels == 'boolean') {
-                    this.config.levels = args.levels ? [...(DEFAULT_CONFIG.levels as ConsoleMethod[])] : []
-                }
-            }
+            this.updateConfig(args)
         }
     }
 
@@ -128,9 +116,12 @@ export class Console {
     }
 
     private getConfig(options?: Omit<ConsoleConfig, 'levels'>) {
-        const config = { ...options, ...this.config, ...(options && options.clearMessage && { ...DEFAULT_CONFIG_CLEAR }) }
+        const configs = [this.config, options]
 
-        consoleNative.log(config)
+        /* eslint no-unused-expressions: ["off"] */
+        options && options.clearMessage && configs.push(DEFAULT_CONFIG_CLEAR)
+
+        const config = Object.assign({}, ...configs)
 
         return config
     }
@@ -195,9 +186,10 @@ export class Console {
         },
         config?: { messageSameLine?: boolean; noColor?: boolean }
     ) {
-        let mess = message
-        if (typeof mess != 'string') {
-            mess = JSON.stringify(message)
+        let mess = message || ''
+
+        if (typeof mess == 'object' || Array.isArray(mess)) {
+            mess = JSON.stringify(mess, null, 2)
         }
 
         const dt = this.getTimestamp(dateTime)
@@ -228,7 +220,7 @@ export class Console {
         let contextComponent = `${context ? ` [${context}] ` : ''}`
 
         // # Message
-        let messageComponent = `${!config || !config.messageSameLine ? '\n' : ''}${mess}`
+        let messageComponent = `${!config || !config.messageSameLine || typeof message == 'object' || Array.isArray(message) ? '\n' : ''}${mess}`
 
         const mc = this.getColorMessageFormate(
             {
@@ -241,16 +233,24 @@ export class Console {
             config?.noColor
         )
 
-        return `${mc.pid && `${mc.pid}  `}${mc.dateTime && `${mc.dateTime}  `}${mc.method && `${mc.method} `} ${mc.context}${mc.message}`
+        return `${mc.pid && `${mc.pid}  `}${mc.dateTime && `${mc.dateTime}  `}${mc.method && `${mc.method} `}${mc.context}${mc.message}`
     }
 
     // UC
+    updateConfig(options: Partial<ConsoleConfig>) {
+        // @ts-expect-error
+        this.config = { ...this.config, ...options }
+
+        if (typeof options.levels != 'undefined') {
+            if (typeof options.levels == 'boolean') {
+                this.config.levels = options.levels ? [...(DEFAULT_CONFIG.levels as ConsoleMethod[])] : []
+            }
+        }
+    }
+
     log(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        if (normal) {
-            return consoleNative.log(message)
-        }
         this.print({
             clearMessage,
             context,
@@ -271,9 +271,6 @@ export class Console {
     error(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        if (normal) {
-            return consoleNative.error(message)
-        }
         this.print({
             clearMessage,
             context,
@@ -294,9 +291,6 @@ export class Console {
     warn(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        if (normal) {
-            return console.warn(message)
-        }
         this.print({
             clearMessage,
             context,
@@ -317,9 +311,6 @@ export class Console {
     info(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        if (normal) {
-            return console.info(message)
-        }
         this.print({
             clearMessage,
             context,
@@ -354,9 +345,13 @@ export class Console {
             return
         }
 
+        if (args.normal) {
+            return console.log(args.message || '')
+        }
+
         const messageFormatted = this.getFormateMessage(args, args)
 
-        console.log(messageFormatted)
+        console.log('#', messageFormatted)
     }
 
     clear() {
