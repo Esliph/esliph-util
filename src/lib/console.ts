@@ -1,5 +1,7 @@
 import { colorizeText, ColorizeArgs, ColorsBackgroundEnable, ColorsConsoleType, ColorsTextEnable, ColorsTextStyles } from '@util/color'
 
+const consoleNative = console
+
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     hour12: false,
     year: 'numeric',
@@ -32,9 +34,9 @@ const MessageColors: {
     dateTime: MessageColorsMethod
 } = {
     message: {
-        log: { color: 'blueLight' },
-        warn: { color: 'yellow' },
-        error: { color: 'red' },
+        log: { color: 'default' },
+        warn: { color: 'default' },
+        error: { color: 'default' },
         info: { color: 'default' },
     },
     method: {
@@ -67,12 +69,17 @@ type MessageFormattedArgs = { text: any; colorize: ColorizeArgs }
 type ConsoleArgument = number | string | boolean | object | any[] | Function | bigint | null | undefined
 type ConsoleMethod = keyof typeof EnumConsoleMethod
 type ConsoleConfig = {
+    levels?: boolean | ConsoleMethod | ConsoleMethod[]
+    normal?: boolean
     showDataTime?: boolean
     pidName?: string
     showPid?: boolean
     showPidCode?: boolean
     showPidName?: boolean
-    levels?: boolean | ConsoleMethod | ConsoleMethod[]
+    context?: string
+    clearMessage?: boolean
+    messageSameLine?: boolean
+    noColor?: boolean
 }
 
 const DEFAULT_CONFIG: ConsoleConfig = {
@@ -81,6 +88,11 @@ const DEFAULT_CONFIG: ConsoleConfig = {
     showPid: true,
     showPidName: true,
     showPidCode: true,
+    clearMessage: false,
+    context: '',
+    messageSameLine: true,
+    noColor: false,
+    normal: false,
     levels: ['error', 'log', 'warn', 'info'],
 }
 
@@ -90,58 +102,68 @@ const DEFAULT_CONFIG_CLEAR: ConsoleConfig = {
 }
 
 export class Console {
-    private context?: string
     private config: ConsoleConfig & {
         levels?: ConsoleMethod[]
     }
 
-    constructor(args?: { context?: string; config?: ConsoleConfig; clearMessage?: boolean }) {
+    constructor(args?: ConsoleConfig) {
         // @ts-expect-error
         this.config = { ...DEFAULT_CONFIG }
 
         if (args) {
-            this.context = args.context
+            // @ts-expect-error
+            this.config = { ...this.config, ...args.config }
 
-            if (args.config) {
-                // @ts-expect-error
-                this.config = { ...this.config, ...args.config }
-
-                if (typeof args.config.levels != 'undefined') {
-                    if (typeof args.config.levels == 'boolean') {
-                        this.config.levels = args.config.levels ? [...(DEFAULT_CONFIG.levels as ConsoleMethod[])] : []
-                    }
+            if (typeof args.levels != 'undefined') {
+                if (typeof args.levels == 'boolean') {
+                    this.config.levels = args.levels ? [...(DEFAULT_CONFIG.levels as ConsoleMethod[])] : []
                 }
-            }
-
-            if (args.clearMessage) {
-                // @ts-expect-error
-                this.config = { ...this.config, ...DEFAULT_CONFIG_CLEAR }
             }
         }
     }
 
     // Util
     getContext() {
-        return this.context
+        return this.config.context
+    }
+
+    private getConfig(options?: Omit<ConsoleConfig, 'levels'>) {
+        const config = { ...options, ...this.config, ...(options && options.clearMessage && { ...DEFAULT_CONFIG_CLEAR }) }
+
+        consoleNative.log(config)
+
+        return config
     }
 
     private getTimestamp(dateTime = new Date(Date.now())): string {
         return dateTimeFormatter.format(dateTime).replace(', ', ' ')
     }
 
-    private getColorMessageFormate({
-        dateTime,
-        message,
-        method,
-        context,
-        pid,
-    }: {
-        pid?: MessageFormattedArgs
-        message: MessageFormattedArgs
-        context?: MessageFormattedArgs
-        method: MessageFormattedArgs
-        dateTime: MessageFormattedArgs
-    }) {
+    private getColorMessageFormate(
+        {
+            dateTime,
+            message,
+            method,
+            context,
+            pid,
+        }: {
+            pid?: MessageFormattedArgs
+            message: MessageFormattedArgs
+            context?: MessageFormattedArgs
+            method: MessageFormattedArgs
+            dateTime: MessageFormattedArgs
+        },
+        noColor = false
+    ) {
+        if (noColor) {
+            return {
+                dateTime: dateTime.text,
+                message: message.text,
+                method: method.text,
+                context: context?.text || '',
+                pid: pid?.text || '',
+            }
+        }
         return {
             dateTime: this.colorizeText(dateTime.text, dateTime.colorize),
             message: this.colorizeText(message.text, message.colorize),
@@ -155,21 +177,24 @@ export class Console {
         return !!this.config.levels?.includes(method)
     }
 
-    private getFormateMessage({
-        message,
-        context,
-        method,
-        dateTime,
-        pidName,
-        pidCode,
-    }: {
-        message: ConsoleArgument
-        context?: string
-        method: ConsoleMethod
-        dateTime: Date
-        pidName?: string
-        pidCode?: number
-    }) {
+    private getFormateMessage(
+        {
+            message,
+            context,
+            method,
+            dateTime,
+            pidName,
+            pidCode,
+        }: {
+            message: ConsoleArgument
+            context?: string
+            method: ConsoleMethod
+            dateTime: Date
+            pidName?: string
+            pidCode?: number
+        },
+        config?: { messageSameLine?: boolean; noColor?: boolean }
+    ) {
         let mess = message
         if (typeof mess != 'string') {
             mess = JSON.stringify(message)
@@ -185,7 +210,7 @@ export class Console {
                 pidComponent = `[${pidName}] `
             }
             if (this.config.showPidCode) {
-                pidComponent += `${pidCode}  `
+                pidComponent += `${pidCode}`
             }
         }
 
@@ -193,82 +218,165 @@ export class Console {
         let dateTimeComponent = ''
 
         if (this.config.showDataTime) {
-            dateTimeComponent = `${this.config.showDataTime && `${dt}  `}`
+            dateTimeComponent = `${this.config.showDataTime && `${dt}`}`
         }
 
         // # Method
         let methodComponent = ` ${method.toUpperCase()} `
 
         // # Context
-        let contextComponent = `${context ? `\t[${context}]\t` : ''}`
+        let contextComponent = `${context ? ` [${context}] ` : ''}`
 
         // # Message
-        let messageComponent = `${message}`
+        let messageComponent = `${!config || !config.messageSameLine ? '\n' : ''}${mess}`
 
-        const mc = this.getColorMessageFormate({
-            message: { text: messageComponent, colorize: MessageColors['message'][method] },
-            context: { text: contextComponent, colorize: MessageColors['context'][method] },
-            method: { text: methodComponent, colorize: MessageColors['method'][method] },
-            dateTime: { text: dateTimeComponent, colorize: MessageColors['dateTime'][method] },
-            pid: { text: pidComponent, colorize: MessageColors['pid'][method] },
-        })
+        const mc = this.getColorMessageFormate(
+            {
+                message: { text: messageComponent, colorize: MessageColors['message'][method] },
+                context: { text: contextComponent, colorize: MessageColors['context'][method] },
+                method: { text: methodComponent, colorize: MessageColors['method'][method] },
+                dateTime: { text: dateTimeComponent, colorize: MessageColors['dateTime'][method] },
+                pid: { text: pidComponent, colorize: MessageColors['pid'][method] },
+            },
+            config?.noColor
+        )
 
-        return `${mc.pid}${mc.dateTime}${mc.method}${mc.context}${mc.message}\n`
+        return `${mc.pid && `${mc.pid}  `}${mc.dateTime && `${mc.dateTime}  `}${mc.method && `${mc.method} `} ${mc.context}${mc.message}`
     }
 
     // UC
-    log(message: ConsoleArgument, context?: string) {
-        this.print({ message, writeStreamType: 'log', context, method: 'log' })
+    log(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
+
+        if (normal) {
+            return consoleNative.log(message)
+        }
+        this.print({
+            clearMessage,
+            context,
+            messageSameLine,
+            normal,
+            pidName: pidName || '',
+            showDataTime,
+            showPid,
+            showPidCode,
+            showPidName,
+            message,
+            dateTime: new Date(Date.now()),
+            pidCode: process.pid,
+            method: 'log',
+        })
     }
 
-    error(message: ConsoleArgument, context?: string) {
-        this.print({ message, writeStreamType: 'error', context, method: 'error' })
+    error(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
+
+        if (normal) {
+            return consoleNative.error(message)
+        }
+        this.print({
+            clearMessage,
+            context,
+            messageSameLine,
+            normal,
+            pidName: pidName || '',
+            showDataTime,
+            showPid,
+            showPidCode,
+            showPidName,
+            message,
+            dateTime: new Date(Date.now()),
+            pidCode: process.pid,
+            method: 'error',
+        })
     }
 
-    warn(message: ConsoleArgument, context?: string) {
-        this.print({ message, writeStreamType: 'log', context, method: 'warn' })
+    warn(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
+
+        if (normal) {
+            return console.warn(message)
+        }
+        this.print({
+            clearMessage,
+            context,
+            messageSameLine,
+            normal,
+            pidName: pidName || '',
+            showDataTime,
+            showPid,
+            showPidCode,
+            showPidName,
+            message,
+            dateTime: new Date(Date.now()),
+            pidCode: process.pid,
+            method: 'warn',
+        })
     }
 
-    info(message: ConsoleArgument, context?: string) {
-        this.print({ message, writeStreamType: 'log', context, method: 'info' })
+    info(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
+
+        if (normal) {
+            return console.info(message)
+        }
+        this.print({
+            clearMessage,
+            context,
+            messageSameLine,
+            normal,
+            pidName: pidName || '',
+            showDataTime,
+            showPid,
+            showPidCode,
+            showPidName,
+            message,
+            dateTime: new Date(Date.now()),
+            pidCode: process.pid,
+            method: 'info',
+        })
     }
 
     colorizeText(text: ColorsConsoleType, args: ColorizeArgs) {
         return colorizeText(text, args)
     }
 
-    private print({
-        message: mes,
-        writeStreamType = 'log',
-        context: c = this.context,
-        method: met,
-    }: {
-        message: ConsoleArgument
-        context?: string
-        method: ConsoleMethod
-        writeStreamType?: keyof typeof EnumWriteStream
-    }) {
-        if (!this.isEnablePrint(met)) {
+    private print(
+        args: {
+            message: ConsoleArgument
+            method: ConsoleMethod
+            pidName: string
+            pidCode: number
+            dateTime: Date
+        } & Omit<ConsoleConfig, 'levels'>
+    ) {
+        if (!this.isEnablePrint(args.method)) {
             return
         }
 
-        const messageFormatted = this.getFormateMessage({
-            message: typeof mes == 'string' ? mes : JSON.stringify(mes),
-            context: c,
-            method: met,
-            dateTime: new Date(Date.now()),
-            pidName: this.config.pidName,
-            pidCode: process.pid,
-        })
+        const messageFormatted = this.getFormateMessage(args, args)
 
-        process[`${EnumWriteStream[writeStreamType]}`].write(messageFormatted)
+        console.log(messageFormatted)
     }
 
     clear() {
-        Console.clear()
+        process['stdout'].write('\x1B[2J\x1B[0f')
     }
 
     static clear() {
-        process['stdout'].write('\x1B[2J\x1B[0f')
+        new Console().clear()
+    }
+
+    static log(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        new Console().log(message, options)
+    }
+    static error(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        new Console().error(message, options)
+    }
+    static warn(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        new Console().warn(message, options)
+    }
+    static info(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
+        new Console().info(message, options)
     }
 }
