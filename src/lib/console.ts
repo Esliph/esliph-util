@@ -1,4 +1,4 @@
-import { colorizeText, ColorizeArgs, ColorsBackgroundEnable, ColorsConsoleType, ColorsTextEnable, ColorsTextStyles } from '@util/color'
+import { colorizeText, ColorizeArgs, ColorsConsoleType } from '@util/color'
 
 const consoleNative = console
 
@@ -251,7 +251,7 @@ export class Console {
     log(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        this.print({
+        return this.print({
             clearMessage,
             context,
             messageSameLine,
@@ -271,7 +271,7 @@ export class Console {
     error(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        this.print({
+        return this.print({
             clearMessage,
             context,
             messageSameLine,
@@ -291,7 +291,7 @@ export class Console {
     warn(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        this.print({
+        return this.print({
             clearMessage,
             context,
             messageSameLine,
@@ -311,7 +311,7 @@ export class Console {
     info(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
         const { clearMessage, context, messageSameLine, normal, pidName, showDataTime, showPid, showPidCode, showPidName } = this.getConfig(options)
 
-        this.print({
+        return this.print({
             clearMessage,
             context,
             messageSameLine,
@@ -342,16 +342,19 @@ export class Console {
         } & Omit<ConsoleConfig, 'levels'>
     ) {
         if (!this.isEnablePrint(args.method)) {
-            return
+            return ''
         }
 
         if (args.normal) {
-            return console.log(args.message || '')
+            consoleNative.log(args.message || '')
+            return args.message || ''
         }
 
         const messageFormatted = this.getFormateMessage(args, args)
 
-        console.log('#', messageFormatted)
+        consoleNative.log('#', messageFormatted)
+
+        return messageFormatted
     }
 
     clear() {
@@ -363,15 +366,15 @@ export class Console {
     }
 
     static log(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
-        new Console().log(message, options)
+        return new Console().log(message, options)
     }
     static error(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
-        new Console().error(message, options)
+        return new Console().error(message, options)
     }
     static warn(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
-        new Console().warn(message, options)
+        return new Console().warn(message, options)
     }
     static info(message?: ConsoleArgument, options?: Omit<ConsoleConfig, 'levels'>) {
-        new Console().info(message, options)
+        return new Console().info(message, options)
     }
 }
