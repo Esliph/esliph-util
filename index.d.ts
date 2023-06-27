@@ -15,27 +15,6 @@ declare module '@esliph/util' {
         uuidv4: () => string,
     }
 
-    export interface ObserverEventData {
-        data: IEventData
-    }
-
-    export type ObserverListener<Events> = {
-        handler: (data: IEvent) => void
-        evt: Events
-        code: number
-        main?: boolean
-    }
-
-    export interface ObserverEventModel<Events> {
-        on: <E extends Events>(evt: E, handler: (data: IEvent) => void, main?: boolean) => number
-        emit: <U extends Events>(evt: U, data: IEvent) => Promise<void>
-        removeListener: (code: number) => void
-        clearListeners: (main?: boolean) => void
-        listeners: ObserverListener<Events>[]
-    }
-
-    export function ObserverEvent<Events>(): ObserverEventModel<Events>
-
     export const hash: {
         generate: (text: string) => Promise<string>
         compare: (hash: string, ref: string) => Promise<boolean>

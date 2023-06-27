@@ -1,15 +1,11 @@
 {
     "compilerOptions": {
         "target": "ES6",
-        "lib": [
-            "ES6"
-        ],
+        "lib": ["ES6"],
         "module": "CommonJS",
         "rootDir": "./src",
         "moduleResolution": "node",
-        "types": [
-            "node",
-        ],
+        "types": ["node"],
         "removeComments": true,
         "sourceMap": false,
         "outDir": "./dist",
@@ -22,15 +18,9 @@
         "emitDecoratorMetadata": true,
         "baseUrl": ".",
         "paths": {
-            "@lib/*": [
-                "src/lib/*"
-            ],
-            "@util/*": [
-                "src/util/*"
-            ],
+            "@lib/*": ["src/lib/*"],
+            "@util/*": ["src/util/*"]
         }
     },
-    "exclude": [
-        "./dist",
-    ]
+    "exclude": ["./dist"]
 }
