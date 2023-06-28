@@ -1,6 +1,9 @@
+/* eslint no-unused-expressions: ["off"] */
+
+import { EnumColorsBackground, EnumColorsStyles, EnumColorsText } from '@util/color'
+
 const consoleNative = console
 
-// Date
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     hour12: false,
     year: 'numeric',
@@ -12,7 +15,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     calendar: 'gregory',
 })
 
-// Enuns
+// Enums
 const EnumTemplateCharacters = {
     open: '<',
     close: '>',
@@ -22,6 +25,12 @@ const EnumTemplateParams = {
     color: 'color',
     background: 'background',
     styles: 'styles',
+} as const
+
+const EnumCliColors = {
+    color: Object.keys(EnumColorsText),
+    background: Object.keys(EnumColorsBackground),
+    styles: Object.keys(EnumColorsStyles),
 } as const
 
 const EnumConsoleMethod = {
@@ -53,15 +62,17 @@ type ConsoleConfig<T extends string> = {
     template?: T
 }
 
+const DEFAULT_TEMPLATE = '# <pidName?color=blue> <pidCode> <dateTime> <method?background=blue&color=yellowLight> [<context>]: <message>'
+
 function getDefaultConfig<T extends string>(args?: { template?: T }) {
     const config: ConsoleConfig<T> = {
-        template: args ? args.template : ('' as T),
+        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T),
     }
 
     return config
 }
 
-export class Console<Template extends string> {
+export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     private config: ConsoleConfig<Template>
 
     constructor(args?: { template?: Template }) {
@@ -77,13 +88,19 @@ export class Console<Template extends string> {
         return config
     }
 
-    private processTemplate(template: string) {
+    private processTemplate<T extends string = Template>({ message, template, keysName }: { template: string, message: string, keysName?: KeysInput<T> }) {
+        keysName && Object.keys(keysName).forEach((_keyName: string) => {
+            // @ts-expect-error
+            const val = keysName[_keyName]
+            if (typeof val == 'function') { val({ method: 'log', message, }) }
+        })
+
         const keys = this.extractKeys(template)
 
         return keys
     }
 
-    private transformKeys(template: string[]) {}
+    private transformKeys(template: string[]) { }
 
     private extractKeys(template: string) {
         const matches = template.match(CAPTURE_KEY) || []
@@ -105,8 +122,12 @@ export class Console<Template extends string> {
             if (param) {
                 params = param
                     .split('&')
-                    // @ts-expect-error
-                    .filter(_param => typeof EnumTemplateParams[_param.split('=')[0]] != 'undefined')
+                    .filter(_param => {
+                        const [key, value] = _param.split('=')
+
+                        // @ts-expect-error
+                        return typeof EnumTemplateParams[key] != 'undefined' && typeof EnumCliColors[key as 'color'] != 'undefined' && EnumCliColors[key as 'color'].find(_color => _color == value)
+                    })
                     .map(param => {
                         const [key, value] = param.split('=')
 
@@ -114,33 +135,21 @@ export class Console<Template extends string> {
                     })
             }
 
-            return { key, ...(params.length > 0 && { params }) }
+            return { key, ...(params.length > 0 && { params }), value: '' }
         })
 
         return keysOperators
     }
 
-    log<T extends string = Template>(message?: any, config?: { template?: T }, keysName?: KeysInput<T>) {
-        /* eslint no-unused-expressions: ["off"] */
-        keysName &&
-            Object.keys(keysName as object).forEach(_keyName => {
-                // @ts-expect-error
-                const val = keysName[_keyName]
-                if (typeof val == 'function') {
-                    val({
-                        method: 'log',
-                        message,
-                    })
-                }
-            })
+    log<T extends string = Template>(message?: any, config?: { template?: T } | null, keysName?: KeysInput<T>) {
 
-        const { template } = this.getConfig(config)
+        const { template } = this.getConfig(config || {})
 
         if (!template) {
             return null
         }
 
-        return this.processTemplate(template)
+        return this.processTemplate({ template, keysName, message })
     }
 
     clear() {

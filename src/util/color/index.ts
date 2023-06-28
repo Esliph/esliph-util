@@ -1,4 +1,4 @@
-const EnumColorsText = {
+export const EnumColorsText = {
     default: '39',
     black: '30',
     red: '31',
@@ -20,7 +20,7 @@ const EnumColorsText = {
     purpleLight: '95',
 } as const
 
-const EnumColorsBackground = {
+export const EnumColorsBackground = {
     default: '49',
     black: '40',
     blackLight: '40',
@@ -44,7 +44,7 @@ const EnumColorsBackground = {
     purpleLight: '105',
 } as const
 
-const EnumColorsStyles = {
+export const EnumColorsStyles = {
     default: '39',
     bold: '1',
     italic: '3',
@@ -57,10 +57,10 @@ const SUFFIX_CODE = 'm'
 const PREFIX_CODE = `${SCAPE_SEQUENCE}[`
 const RESET_TEXT_STYLE = '0'
 
-export type ColorizeArgs = { color: ColorsTextEnable, background?: ColorsBackgroundEnable, styles?: ColorsTextStyles | ColorsTextStyles[] }
+export type ColorizeArgs = { color: ColorsTextEnable, background?: ColorsBackgroundEnable, styles?: ColorsTextStylesEnable | ColorsTextStylesEnable[] }
 export type ColorsTextEnable = keyof typeof EnumColorsText;
 export type ColorsBackgroundEnable = keyof typeof EnumColorsBackground;
-export type ColorsTextStyles = keyof typeof EnumColorsStyles;
+export type ColorsTextStylesEnable = keyof typeof EnumColorsStyles;
 export type ColorsConsoleType = number | string | boolean | object | any[] | Function | bigint | null | undefined
 type CodeType = string | number
 
