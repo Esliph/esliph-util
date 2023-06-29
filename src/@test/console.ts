@@ -8,7 +8,7 @@ const template = '# <pidName?color=blue> <pidCode?styles=bold> <dateTime> <metho
 
 const consoleLiph = new Console({ template }, {
     context: () => 'Teste',
-    dateTime: (args) => new Date(Date.now()),
+    dateTime: (args) => new Date(Date.now()).getTime(),
     pidName: 'Esliph',
     pidCode: () => process.pid,
     method: ({method}) => method,
@@ -18,4 +18,4 @@ const consoleLiph = new Console({ template }, {
 const value = consoleLiph.log({hello: 'World'}, {})
 
 /* eslint no-unused-expressions: ["off"] */
-console.log(JSON.stringify({template: value}, null, 2))
+// console.log(JSON.stringify(value, null, 2))
