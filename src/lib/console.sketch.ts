@@ -1,7 +1,6 @@
 /* eslint no-unused-expressions: ["off"] */
 
 import { EnumColorsBackground, EnumColorsStyles, EnumColorsText } from '@util/color'
-
 const consoleNative = console
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
