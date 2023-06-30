@@ -54,7 +54,7 @@ type TemplateKeys<S extends string> = S extends `${typeof EnumTemplateCharacters
     ? KeyName | TemplateKeys<`${RestBefore}${RestAfter}`>
     : never
 
-type FilterKeysName<T extends string> = T extends `!${infer _}` ? never : T
+type FilterKeysName<T extends string> = T extends `${typeof EnumTemplateCharacters.ignore}${infer _}` ? never : T
 
 type ExtractKeysName<T extends string> = T extends `${infer Value}?${infer _}` ? Value : T
 
@@ -62,7 +62,7 @@ type ExtractKeys<T extends string> = FilterKeysName<ExtractKeysName<TemplateKeys
 
 type KeysInput<T extends string> = Partial<KeysFormTemplate<ExtractKeys<T>>>
 
-const CAPTURE_KEY = /<(?!.*?!.+?>)(.*?)>/g
+const CAPTURE_KEY = new RegExp(`${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}.*?${EnumTemplateCharacters.ignore}.+?${EnumTemplateCharacters.close})(.*?)${EnumTemplateCharacters.close}`, 'g')
 
 // Config
 type ConsoleConfig<T extends string> = {
@@ -70,15 +70,15 @@ type ConsoleConfig<T extends string> = {
 }
 
 const getRegexForCapture = (target: string) => {
-    return new RegExp(`<(?!\\!)[^>]*${target}[^>]*>`, 'g')
+    return new RegExp(`${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}\\${EnumTemplateCharacters.ignore})[^${EnumTemplateCharacters.close}]*${target}[^${EnumTemplateCharacters.close}]*${EnumTemplateCharacters.close}`, 'g')
 }
 
-const DEFAULT_TEMPLATE = '# <pidName?color=blue> <pidCode> <dateTime> <method?background=blue&color=yellowLight> [<context>]: <message>'
-const DEFAULT_KEYS_VALUES: KeysInput<''> = {}
+const DEFAULT_TEMPLATE = '# [<pidName?color=green>] <pidCode?color=green>  <dateTime> <method?background=blue> <context?color=green>: <message>'
+const DEFAULT_KEYS_VALUES: KeysInput<typeof DEFAULT_TEMPLATE> = {}
 
 function getDefaultConfig<T extends string>(args?: { template?: T }) {
     const config: ConsoleConfig<T> = {
-        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T),
+        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T)
     }
 
     const keysValues: KeysInput<T> = {}
@@ -120,7 +120,7 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     }
 
     // Process
-    private print<T extends string = Template>(message: any, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
+    private print<T extends string>(message: any, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
         if (!config.template) {
             return null
         }
@@ -141,14 +141,14 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
             }
         }
 
-        const kv = values as Partial<KeysFormTemplate<ExtractKeysName<TemplateKeys<Template>>>>
+        const kv = values as Partial<KeysFormTemplate<ExtractKeysName<T>>>
 
         const templateProcessed = this.processTemplate({ template: config.template, keysValues: kv, message })
 
         return templateProcessed
     }
 
-    private processTemplate<T extends string = Template>({ message, template, keysValues }: { template: string; message: string; keysValues: KeysInput<T> }) {
+    private processTemplate<T extends string>({ message, template, keysValues }: { template: string; message: string; keysValues: KeysInput<T> }) {
         const keys = this.extractKeys(template)
 
 
