@@ -2,20 +2,28 @@ import { Console } from '@lib/console.sketch'
 
 Console.clear()
 
-Console.native().log('\n')
-
-const template = '# <pidName?color=blue> <pidCode?styles=bold> <dateTime> <method?background=blue&color=yellowLight> [<context>]: <message>'
-
-const consoleLiph = new Console({ template }, {
-    context: () => 'Teste',
-    dateTime: (args) => new Date(Date.now()).getTime(),
-    pidName: 'Esliph',
-    pidCode: () => process.pid,
-    method: ({method}) => method,
-    message: ({message}) => message,
+const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+    hour12: false,
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    day: '2-digit',
+    month: '2-digit',
+    calendar: 'gregory',
 })
 
-const value = consoleLiph.log({hello: 'World'}, {})
+const template = '# [<pidName?color=green>] <pidCode?color=green>  <dateTime> <method?background=blue> <context?color=green>: <message>'
 
-/* eslint no-unused-expressions: ["off"] */
-// console.log(JSON.stringify(value, null, 2))
+const consoleLiph = new Console({ template }, {
+    context: '[Teste]',
+    dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
+    pidName: 'Esliph',
+    pidCode: () => process.pid,
+    method: ({ method }) => ` ${method.toUpperCase()} `,
+    message: ({ message }) => message,
+})
+
+const value = consoleLiph.log('Hello World', {})
+
+console.log(value)

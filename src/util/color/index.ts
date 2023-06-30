@@ -57,7 +57,7 @@ const SUFFIX_CODE = 'm'
 const PREFIX_CODE = `${SCAPE_SEQUENCE}[`
 const RESET_TEXT_STYLE = '0'
 
-export type ColorizeArgs = { color: ColorsTextEnable, background?: ColorsBackgroundEnable, styles?: ColorsTextStylesEnable | ColorsTextStylesEnable[] }
+export type ColorizeArgs = { color?: ColorsTextEnable, background?: ColorsBackgroundEnable, styles?: ColorsTextStylesEnable | ColorsTextStylesEnable[] }
 export type ColorsTextEnable = keyof typeof EnumColorsText;
 export type ColorsBackgroundEnable = keyof typeof EnumColorsBackground;
 export type ColorsTextStylesEnable = keyof typeof EnumColorsStyles;
@@ -90,9 +90,7 @@ function colorize(text: ColorsConsoleType, ...codes: CodeType[]) {
 export function colorizeText(text: ColorsConsoleType, { color, background, styles }: ColorizeArgs) {
     if (!isColorAllowed()) { return `${text}` }
 
-    if (!EnumColorsText[color]) { return `${text}` }
-
-    const codeColor = EnumColorsText[color]
+    const codeColor = color ? EnumColorsText[color] : ''
     const codeBackground = background ? EnumColorsBackground[background] : ''
     const codesStyles = styles ? typeof styles == 'string' ? [EnumColorsStyles[styles]] : styles.map(style => EnumColorsStyles[style]) : []
 

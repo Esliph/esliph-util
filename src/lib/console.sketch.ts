@@ -1,6 +1,6 @@
 /* eslint no-unused-expressions: ["off"] */
 
-import { EnumColorsBackground, EnumColorsStyles, EnumColorsText } from '@util/color'
+import { ColorizeArgs, ColorsConsoleType, EnumColorsBackground, EnumColorsStyles, EnumColorsText, colorizeText } from '@util/color'
 
 const consoleNative = console
 
@@ -54,7 +54,7 @@ type TemplateKeys<S extends string> = S extends `${typeof EnumTemplateCharacters
     ? KeyName | TemplateKeys<`${RestBefore}${RestAfter}`>
     : never
 
-type FilterKeysName<T extends string> = T extends `!${infer Value}` ? never : T
+type FilterKeysName<T extends string> = T extends `!${infer _}` ? never : T
 
 type ExtractKeysName<T extends string> = T extends `${infer Value}?${infer _}` ? Value : T
 
@@ -67,6 +67,10 @@ const CAPTURE_KEY = /<(?!.*?!.+?>)(.*?)>/g
 // Config
 type ConsoleConfig<T extends string> = {
     template?: T
+}
+
+const getRegexForCapture = (target: string) => {
+    return new RegExp(`<(?!\\!)[^>]*${target}[^>]*>`, 'g')
 }
 
 const DEFAULT_TEMPLATE = '# <pidName?color=blue> <pidCode> <dateTime> <method?background=blue&color=yellowLight> [<context>]: <message>'
@@ -102,6 +106,20 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
         return { config, keysValues: keysValue }
     }
 
+    private getOccurrenceForCapture(text: string, selector: string) {
+        const occurrences: { value: string; initial: number; final: number }[] = []
+        let match
+
+        const selectorRegex = getRegexForCapture(selector)
+
+        while ((match = selectorRegex.exec(text)) !== null) {
+            occurrences.push({ value: match[0], initial: match.index, final: selectorRegex.lastIndex })
+        }
+
+        return occurrences[0] || null
+    }
+
+    // Process
     private print<T extends string = Template>(message: any, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
         if (!config.template) {
             return null
@@ -119,7 +137,7 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
             }
 
             if (typeof values[key] == 'object' || Array.isArray(values[key])) {
-                values[key] = '\n' + JSON.stringify(values[key], null, 2)
+                values[key] = '\n' + JSON.stringify(values[key], null, 2) + '\n'
             }
         }
 
@@ -133,31 +151,42 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     private processTemplate<T extends string = Template>({ message, template, keysValues }: { template: string; message: string; keysValues: KeysInput<T> }) {
         const keys = this.extractKeys(template)
 
+
         for (const key in keysValues) {
             const index = keys.findIndex(_key => _key.key == key)
+            const params: ColorizeArgs = {}
+
+            if (index < 0) { continue }
+
+            keys[index].params && keys[index].params?.forEach(param => {
+                for (const prop in param) {
+                    // @ts-expect-error
+                    params[prop as keyof ColorizeArgs] = param[prop]
+                }
+            })
+
+            // @ts-expect-error
+            keys[index].value = this.colorizeText(keysValues[key], { background: params.background, color: params.color, styles: params.styles })
         }
 
-        console.log(keysValues)
+        keys.forEach(({ value, key }) => {
+            const occurrence = this.getOccurrenceForCapture(template, key)
+            template = template.substring(0, occurrence.initial) + value + template.substring(occurrence.final)
+        })
 
-        return keys
+        return template
     }
 
     private extractKeys(template: string) {
-        let match
-
-        const keysName: { key: string; initial: number; final: number }[] = []
-
-        while ((match = CAPTURE_KEY.exec(template)) !== null) {
-            keysName.push({ key: match[0].replace(/<|>/g, ''), initial: match.index, final: CAPTURE_KEY.lastIndex })
-        }
+        const keysName: string[] = template.match(CAPTURE_KEY)?.map(m => m.replace(/<|>/g, '')) || []
 
         const keysOperators = keysName
-            .filter(({ key: _key }) => {
+            .filter(_key => {
                 let [key, param] = _key.replace(/ /gi, '').split('?')
 
                 return key || param
             })
-            .map(({ key: _key, final, initial }) => {
+            .map(_key => {
                 let [key, param] = _key.replace(/ /gi, '').split('?')
 
                 if (key) key = key.trim()
@@ -185,7 +214,7 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
                         })
                 }
 
-                return { key, ...(params.length > 0 && { params }), value: '' as any, initial, final }
+                return { key, ...(params.length > 0 && { params }), value: '' as any }
             })
 
         return keysOperators
@@ -204,6 +233,10 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
 
     native() {
         return consoleNative
+    }
+
+    colorizeText(text: ColorsConsoleType, args: ColorizeArgs) {
+        return colorizeText(text, args)
     }
 
     static native() {
