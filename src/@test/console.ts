@@ -13,16 +13,13 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     calendar: 'gregory',
 })
 
-const template = '<prefix?styles=italic> [<pidName?color=blue&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue> <context?color=greenLight>: <message>'
+const template = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=blue&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?value="[Teste]"&color=greenLight>: <message>'
 
-const consoleLiph = new Console({ template}, {
-    prefix: '#',
-    context: '[Teste]',
+const consoleLiph = new Console({ template }, {
     dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
-    pidName: 'Esliph',
-    pidCode: () => process.pid,
     method: ({ method }) => ` ${method.toUpperCase()} `,
     message: ({ message }) => message,
+    pidCode: process.pid,
 })
 
 const value = consoleLiph.log('Hello World', {})

@@ -1,6 +1,6 @@
-/* eslint no-unused-expressions: ["off"] */
-
 import { ColorizeArgs, ColorsConsoleType, EnumColorsBackground, EnumColorsStyles, EnumColorsText, colorizeText } from '@util/color'
+
+/* eslint no-unused-expressions: ["off"] */
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     hour12: false,
@@ -18,12 +18,17 @@ const EnumTemplateCharacters = {
     open: '<',
     close: '>',
     ignore: '!',
+    separatorStyles: ';',
+    param: '?',
+    separatorParam: '&',
+    receive: '=',
 } as const
 
 const EnumTemplateParams = {
     color: 'color',
     background: 'background',
     styles: 'styles',
+    value: 'value',
 } as const
 
 const EnumCliColors = {
@@ -46,7 +51,7 @@ type GenericType<T extends string, U = any> = { [x in T]: U }
 
 type NativeTypes = Date | number | string | boolean | object | any[] | Function | bigint | null | undefined
 
-type KeysFormTemplate<T extends string> = GenericType<T, NativeTypes | ((args: { method: keyof typeof EnumConsoleMethod; message: any }) => NativeTypes)>
+type KeysFormTemplate<T extends string> = GenericType<T, NativeTypes | ((args: { method: TEnumConsoleMethod; message: any }) => NativeTypes)>
 
 type TemplateKeys<S extends string> = S extends `${typeof EnumTemplateCharacters.open}${infer KeyName}${typeof EnumTemplateCharacters.close}${infer RestAfter}`
     ? KeyName | TemplateKeys<RestAfter>
@@ -56,16 +61,13 @@ type TemplateKeys<S extends string> = S extends `${typeof EnumTemplateCharacters
 
 type FilterKeysName<T extends string> = T extends `${typeof EnumTemplateCharacters.ignore}${infer _}` ? never : T
 
-type ExtractKeysName<T extends string> = T extends `${infer Value}?${infer _}` ? Value : T
+type ExtractKeysName<T extends string> = T extends `${infer Value}${typeof EnumTemplateCharacters.param}${infer _}` ? Value : T
 
 type ExtractKeys<T extends string> = FilterKeysName<ExtractKeysName<TemplateKeys<T>>>
 
 type KeysInput<T extends string> = Partial<KeysFormTemplate<ExtractKeys<T>>>
 
-const CAPTURE_KEY = new RegExp(
-    `${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}.*?${EnumTemplateCharacters.ignore}.+?${EnumTemplateCharacters.close})(.*?)${EnumTemplateCharacters.close}`,
-    'g'
-)
+const CAPTURE_KEY = new RegExp(`${EnumTemplateCharacters.open}(?!/?![a-zA-Z0-9])([^${EnumTemplateCharacters.close}]+)${EnumTemplateCharacters.close}`, 'g')
 
 // Config
 type ConsoleConfig<T extends string, Templates extends string = TEnumConsoleMethod> = {
@@ -80,8 +82,8 @@ const getRegexForCapture = (target: string) => {
     )
 }
 
-const DEFAULT_TEMPLATE = '# [<pidName?color=green>] <pidCode?color=green>  <dateTime> <method?background=blue> <context?color=green>: <message>'
-const DEFAULT_KEYS_VALUES: KeysInput<typeof DEFAULT_TEMPLATE> = {}
+const DEFAULT_TEMPLATE =
+    '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=blue&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue> <context?value="[Teste]"&color=greenLight>: <message>'
 
 function getDefaultConfig<T extends string>(args?: { template?: T }) {
     const config: ConsoleConfig<T> = {
@@ -99,7 +101,7 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     protected native: globalThis.Console = console
     static readonly native: globalThis.Console = console
 
-    constructor(args?: ConsoleConfig<Template>, keysValues?: KeysInput<Template>) {
+    constructor(args?: { template?: Template }, keysValues?: KeysInput<Template>) {
         this.config = { ...getDefaultConfig<Template>(args).config, ...args }
         this.keysValues = { ...getDefaultConfig<Template>(args).keysValues, ...keysValues }
     }
@@ -116,16 +118,10 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     }
 
     private getOccurrenceForCapture(text: string, selector: string) {
-        const occurrences: { value: string; initial: number; final: number }[] = []
-        let match
-
         const selectorRegex = getRegexForCapture(selector)
+        let match = selectorRegex.exec(text)
 
-        while ((match = selectorRegex.exec(text)) !== null) {
-            occurrences.push({ value: match[0], initial: match.index, final: selectorRegex.lastIndex })
-        }
-
-        return occurrences[0] || null
+        return match ? { value: match[0], initial: match.index, final: selectorRegex.lastIndex } : null
     }
 
     // Process
@@ -160,6 +156,16 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     private processTemplate<T extends string>({ template, keysValues }: { template: string; keysValues: KeysInput<T> }) {
         const keys = this.extractKeys(template)
 
+        keys.filter(_k => Object.keys(keysValues).every(_kv => _k.key != _kv)).forEach(_key => {
+            const valueParam = _key.params ? _key.params.find(p => p.value)?.value : ''
+
+            // @ts-expect-error
+            const value = valueParam.replace(/['"]/g, '')
+
+            // @ts-expect-error
+            keysValues[_key.key] = value
+        })
+
         for (const key in keysValues) {
             const index = keys.findIndex(_key => _key.key == key)
             const params: ColorizeArgs = {}
@@ -182,6 +188,11 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
 
         keys.forEach(({ value, key }) => {
             const occurrence = this.getOccurrenceForCapture(template, key)
+
+            if (!occurrence) {
+                return
+            }
+
             template = template.substring(0, occurrence.initial) + value + template.substring(occurrence.final)
         })
 
@@ -193,39 +204,37 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
 
         const keysOperators = keysName
             .filter(_key => {
-                let [key, param] = _key.replace(/ /gi, '').split('?')
+                let [key, param] = _key.replace(/ (?=(?:(?:[^'"]*['"]){2})*[^'"]*$)/g, '').split(EnumTemplateCharacters.param)
 
                 return key || param
             })
             .map(_key => {
-                let [key, param] = _key.replace(/ /gi, '').split('?')
+                let [key, param] = _key.replace(/ (?=(?:(?:[^'"]*['"]){2})*[^'"]*$)/g, '').split(EnumTemplateCharacters.param)
 
-                if (key) key = key.trim()
-                else key = '?'
+                if (!key) key = EnumTemplateCharacters.param
 
-                let params: { [x in keyof { color: string; background: string; styles: string[] }]?: string }[] = []
+                let params: { [x in keyof { color: string; background: string; styles: string[]; value: string }]?: string }[] = []
 
                 if (param) {
                     params = param
-                        .split('&')
+                        .split(EnumTemplateCharacters.separatorParam)
                         .filter(_param => {
-                            const [key, value] = _param.split('=')
+                            const [key, value] = _param.split(EnumTemplateCharacters.receive)
 
-                            const styles = value.split(';')
+                            const styles = value.split(EnumTemplateCharacters.separatorStyles)
 
                             return (
                                 // @ts-expect-error
-                                typeof EnumTemplateParams[key] != 'undefined' &&
-                                typeof EnumCliColors[key as 'color'] != 'undefined' &&
-                                styles.filter(_style => EnumCliColors[key as 'color'].find(_prop => _prop == _style))
+                                (typeof EnumTemplateParams[key] != 'undefined' &&
+                                    typeof EnumCliColors[key as 'color'] != 'undefined' &&
+                                    styles.filter(_style => EnumCliColors[key as 'color'].find(_prop => _prop == _style))) ||
+                                key == EnumTemplateParams.value
                             )
                         })
                         .map(param => {
-                            const [key, value] = param.split('=')
+                            const [key, value] = param.split(EnumTemplateCharacters.receive)
 
-                            const styles = value.split(';')
-
-                            return { [`${key}`]: key != 'styles' ? value : value.split(';') }
+                            return { [`${key}`]: key != 'styles' ? value : value.split(EnumTemplateCharacters.separatorStyles) }
                         })
                 }
 
