@@ -83,27 +83,36 @@ const getRegexForCapture = (target: string) => {
 }
 
 const DEFAULT_TEMPLATE =
-    '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=blue&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue> <context?value="[Teste]"&color=greenLight>: <message>'
+    '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>'
 
-function getDefaultConfig<T extends string>(args?: { template?: T }) {
+type IDefautlTemplate = typeof DEFAULT_TEMPLATE
+
+const DEFAULT_TEMPLATE_KEYS_NAME: KeysInput<IDefautlTemplate> = {
+    dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
+    method: ({ method }) => ` ${method.toUpperCase()} `,
+    message: ({ message }) => message,
+    pidCode: process.pid,
+}
+
+function getDefaultConfig<T extends string>(args: { template?: T } = {}, keysValues: KeysInput<T> = {}) {
     const config: ConsoleConfig<T> = {
         template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T),
     }
 
-    const keysValues: KeysInput<T> = {}
+    const kv: KeysInput<T> = { ...DEFAULT_TEMPLATE_KEYS_NAME, ...keysValues } as KeysInput<T>
 
-    return { config, keysValues }
+    return { config, keysValues: kv }
 }
 
-export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
+export class Console<Template extends string = IDefautlTemplate> {
     private config: ConsoleConfig<Template>
     private keysValues: KeysInput<Template>
     protected native: globalThis.Console = console
     static readonly native: globalThis.Console = console
 
-    constructor(args?: { template?: Template }, keysValues?: KeysInput<Template>) {
-        this.config = { ...getDefaultConfig<Template>(args).config, ...args }
-        this.keysValues = { ...getDefaultConfig<Template>(args).keysValues, ...keysValues }
+    constructor(args: { template?: Template } | null = {}, keysValues: KeysInput<Template> = {}) {
+        this.config = { ...getDefaultConfig<Template>(args || {}, keysValues).config, ...args }
+        this.keysValues = { ...getDefaultConfig<Template>(args || {}, keysValues).keysValues, ...keysValues }
     }
 
     // Util
@@ -150,6 +159,8 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
 
         const templateProcessed = this.processTemplate({ template: config.template, keysValues: kv })
 
+        this.native.log(templateProcessed)
+
         return templateProcessed
     }
 
@@ -157,9 +168,8 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
         const keys = this.extractKeys(template)
 
         keys.filter(_k => Object.keys(keysValues).every(_kv => _k.key != _kv)).forEach(_key => {
-            const valueParam = _key.params ? _key.params.find(p => p.value)?.value : ''
+            const valueParam = _key.params ? _key.params.find(p => p.value)?.value || '' : ''
 
-            // @ts-expect-error
             const value = valueParam.replace(/['"]/g, '')
 
             // @ts-expect-error
@@ -234,7 +244,7 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
                         .map(param => {
                             const [key, value] = param.split(EnumTemplateCharacters.receive)
 
-                            return { [`${key}`]: key != 'styles' ? value : value.split(EnumTemplateCharacters.separatorStyles) }
+                            return { [`${key}`]: key != 'styles' ? value : value.split(EnumTemplateCharacters.separatorStyles).filter(param => param) }
                         })
                 }
 
