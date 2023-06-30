@@ -8,7 +8,7 @@
     "scripts": {
         "start": "node dist/index.js",
         "dev": "tsx watch src/index.ts",
-        "test": "tsx watch",
+        "dev:console": "tsx watch src/@test/console.ts",
         "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
         "build": "npx tsup src",
         "valid:lint": "eslint \"**/*.ts\"",

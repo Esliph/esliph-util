@@ -13,9 +13,10 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     calendar: 'gregory',
 })
 
-const template = '# [<pidName?color=green>] <pidCode?color=green>  <dateTime> <method?background=blue> <context?color=green>: <message>'
+const template = '<prefix?styles=italic> [<pidName?color=blue&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue> <context?color=greenLight>: <message>'
 
-const consoleLiph = new Console({ template }, {
+const consoleLiph = new Console({ template}, {
+    prefix: '#',
     context: '[Teste]',
     dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
     pidName: 'Esliph',
@@ -26,4 +27,4 @@ const consoleLiph = new Console({ template }, {
 
 const value = consoleLiph.log('Hello World', {})
 
-console.log(value)
+Console.native.log(value)

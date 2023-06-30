@@ -2,8 +2,6 @@
 
 import { ColorizeArgs, ColorsConsoleType, EnumColorsBackground, EnumColorsStyles, EnumColorsText, colorizeText } from '@util/color'
 
-const consoleNative = console
-
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
     hour12: false,
     year: 'numeric',
@@ -41,6 +39,8 @@ const EnumConsoleMethod = {
     warn: 'warn',
 } as const
 
+type TEnumConsoleMethod = keyof typeof EnumConsoleMethod
+
 // Template
 type GenericType<T extends string, U = any> = { [x in T]: U }
 
@@ -62,15 +62,22 @@ type ExtractKeys<T extends string> = FilterKeysName<ExtractKeysName<TemplateKeys
 
 type KeysInput<T extends string> = Partial<KeysFormTemplate<ExtractKeys<T>>>
 
-const CAPTURE_KEY = new RegExp(`${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}.*?${EnumTemplateCharacters.ignore}.+?${EnumTemplateCharacters.close})(.*?)${EnumTemplateCharacters.close}`, 'g')
+const CAPTURE_KEY = new RegExp(
+    `${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}.*?${EnumTemplateCharacters.ignore}.+?${EnumTemplateCharacters.close})(.*?)${EnumTemplateCharacters.close}`,
+    'g'
+)
 
 // Config
-type ConsoleConfig<T extends string> = {
+type ConsoleConfig<T extends string, Templates extends string = TEnumConsoleMethod> = {
     template?: T
+    templates?: Partial<Record<Templates, string>>
 }
 
 const getRegexForCapture = (target: string) => {
-    return new RegExp(`${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}\\${EnumTemplateCharacters.ignore})[^${EnumTemplateCharacters.close}]*${target}[^${EnumTemplateCharacters.close}]*${EnumTemplateCharacters.close}`, 'g')
+    return new RegExp(
+        `${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}\\${EnumTemplateCharacters.ignore})[^${EnumTemplateCharacters.close}]*${target}[^${EnumTemplateCharacters.close}]*${EnumTemplateCharacters.close}`,
+        'g'
+    )
 }
 
 const DEFAULT_TEMPLATE = '# [<pidName?color=green>] <pidCode?color=green>  <dateTime> <method?background=blue> <context?color=green>: <message>'
@@ -78,7 +85,7 @@ const DEFAULT_KEYS_VALUES: KeysInput<typeof DEFAULT_TEMPLATE> = {}
 
 function getDefaultConfig<T extends string>(args?: { template?: T }) {
     const config: ConsoleConfig<T> = {
-        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T)
+        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T),
     }
 
     const keysValues: KeysInput<T> = {}
@@ -89,8 +96,10 @@ function getDefaultConfig<T extends string>(args?: { template?: T }) {
 export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     private config: ConsoleConfig<Template>
     private keysValues: KeysInput<Template>
+    protected native: globalThis.Console = console
+    static readonly native: globalThis.Console = console
 
-    constructor(args?: { template?: Template }, keysValues?: KeysInput<Template>) {
+    constructor(args?: ConsoleConfig<Template>, keysValues?: KeysInput<Template>) {
         this.config = { ...getDefaultConfig<Template>(args).config, ...args }
         this.keysValues = { ...getDefaultConfig<Template>(args).keysValues, ...keysValues }
     }
@@ -143,27 +152,29 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
 
         const kv = values as Partial<KeysFormTemplate<ExtractKeysName<T>>>
 
-        const templateProcessed = this.processTemplate({ template: config.template, keysValues: kv, message })
+        const templateProcessed = this.processTemplate({ template: config.template, keysValues: kv })
 
         return templateProcessed
     }
 
-    private processTemplate<T extends string>({ message, template, keysValues }: { template: string; message: string; keysValues: KeysInput<T> }) {
+    private processTemplate<T extends string>({ template, keysValues }: { template: string; keysValues: KeysInput<T> }) {
         const keys = this.extractKeys(template)
-
 
         for (const key in keysValues) {
             const index = keys.findIndex(_key => _key.key == key)
             const params: ColorizeArgs = {}
 
-            if (index < 0) { continue }
+            if (index < 0) {
+                continue
+            }
 
-            keys[index].params && keys[index].params?.forEach(param => {
-                for (const prop in param) {
-                    // @ts-expect-error
-                    params[prop as keyof ColorizeArgs] = param[prop]
-                }
-            })
+            keys[index].params &&
+                keys[index].params?.forEach(param => {
+                    for (const prop in param) {
+                        // @ts-expect-error
+                        params[prop as keyof ColorizeArgs] = param[prop]
+                    }
+                })
 
             // @ts-expect-error
             keys[index].value = this.colorizeText(keysValues[key], { background: params.background, color: params.color, styles: params.styles })
@@ -200,17 +211,21 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
                         .filter(_param => {
                             const [key, value] = _param.split('=')
 
+                            const styles = value.split(';')
+
                             return (
                                 // @ts-expect-error
                                 typeof EnumTemplateParams[key] != 'undefined' &&
                                 typeof EnumCliColors[key as 'color'] != 'undefined' &&
-                                EnumCliColors[key as 'color'].find(_color => _color == value)
+                                styles.filter(_style => EnumCliColors[key as 'color'].find(_prop => _prop == _style))
                             )
                         })
                         .map(param => {
                             const [key, value] = param.split('=')
 
-                            return { [`${key}`]: value }
+                            const styles = value.split(';')
+
+                            return { [`${key}`]: key != 'styles' ? value : value.split(';') }
                         })
                 }
 
@@ -228,22 +243,14 @@ export class Console<Template extends string = typeof DEFAULT_TEMPLATE> {
     }
 
     clear() {
-        consoleNative.clear()
-    }
-
-    native() {
-        return consoleNative
+        Console.clear()
     }
 
     colorizeText(text: ColorsConsoleType, args: ColorizeArgs) {
         return colorizeText(text, args)
     }
 
-    static native() {
-        return consoleNative
-    }
-
     static clear() {
-        new Console().clear()
+        this.native.clear()
     }
 }
