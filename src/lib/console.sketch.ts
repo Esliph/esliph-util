@@ -53,7 +53,8 @@ type NativeTypes = Date | number | string | boolean | object | any[] | Function 
 
 type KeysFormTemplate<T extends string> = GenericType<T, NativeTypes | ((args: { method: TEnumConsoleMethod; message: any }) => NativeTypes)>
 
-type TemplateKeys<S extends string> = S extends `${typeof EnumTemplateCharacters.open}${infer KeyName}${typeof EnumTemplateCharacters.close}${infer RestAfter}`
+type TemplateKeys<S extends string> =
+    S extends `${typeof EnumTemplateCharacters.open}${infer KeyName}${typeof EnumTemplateCharacters.close}${infer RestAfter}`
     ? KeyName | TemplateKeys<RestAfter>
     : S extends `${infer RestBefore}${typeof EnumTemplateCharacters.open}${infer KeyName}${typeof EnumTemplateCharacters.close}${infer RestAfter}`
     ? KeyName | TemplateKeys<`${RestBefore}${RestAfter}`>
@@ -69,25 +70,38 @@ type KeysInput<T extends string> = Partial<KeysFormTemplate<ExtractKeys<T>>>
 
 const CAPTURE_KEY = new RegExp(`${EnumTemplateCharacters.open}(?!/?![a-zA-Z0-9])([^${EnumTemplateCharacters.close}]+)${EnumTemplateCharacters.close}`, 'g')
 
+type ConsoleConfigTemplates<Methods extends TEnumConsoleMethod = TEnumConsoleMethod, Template extends { [k in Methods]?: string } = Record<Methods, string>> = { [x in Methods]?: Template[x] }
+
+const a: ConsoleConfigTemplates = {
+    error: '',
+    info: '',
+    log: '',
+    warn: ''
+}
+
 // Config
-type ConsoleConfig<T extends string, Templates extends string = TEnumConsoleMethod> = {
+type ConsoleConfig<T extends string, Templates extends string = any> = {
     template?: T
     templates?: Partial<Record<Templates, string>>
 }
 
 const getRegexForCapture = (target: string) => {
-    return new RegExp(
-        `${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}\\${EnumTemplateCharacters.ignore})[^${EnumTemplateCharacters.close}]*${target}[^${EnumTemplateCharacters.close}]*${EnumTemplateCharacters.close}`,
-        'g'
-    )
+    return new RegExp(`${EnumTemplateCharacters.open}(?${EnumTemplateCharacters.ignore}\\${EnumTemplateCharacters.ignore})[^${EnumTemplateCharacters.close}]*${target}[^${EnumTemplateCharacters.close}]*${EnumTemplateCharacters.close}`, 'g')
 }
 
-const DEFAULT_TEMPLATE =
-    '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>'
+const DEFAULT_TEMPLATE = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>'
 
-type IDefautlTemplate = typeof DEFAULT_TEMPLATE
+const DEFAULT_TEMPLATES: ConsoleConfigTemplates = {
+    log: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>',
+    error: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=red>  <context?color=green&styles=bold>: <message>',
+    warn: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=yellow&color=black>  <context?color=green&styles=bold>: <message>',
+    info: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=white>  <context?color=green&styles=bold>: <message>',
+}
 
-const DEFAULT_TEMPLATE_KEYS_NAME: KeysInput<IDefautlTemplate> = {
+type IDefaultTemplate = typeof DEFAULT_TEMPLATE
+type IDefaultTemplates = typeof DEFAULT_TEMPLATES
+
+const DEFAULT_TEMPLATE_KEYS_NAME: KeysInput<IDefaultTemplate> = {
     dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
     method: ({ method }) => ` ${method.toUpperCase()} `,
     message: ({ message }) => message,
@@ -104,7 +118,7 @@ function getDefaultConfig<T extends string>(args: { template?: T } = {}, keysVal
     return { config, keysValues: kv }
 }
 
-export class Console<Template extends string = IDefautlTemplate> {
+export class Console<Template extends string = IDefaultTemplate> {
     private config: ConsoleConfig<Template>
     private keysValues: KeysInput<Template>
     protected native: globalThis.Console = console
@@ -134,17 +148,15 @@ export class Console<Template extends string = IDefautlTemplate> {
     }
 
     // Process
-    private print<T extends string>(message: any, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
-        if (!config.template) {
-            return null
-        }
+    private print<T extends string>(message: any, method: string, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
+        if (!config.template) { return null }
 
         const values: Partial<GenericType<any>> = {}
 
         for (const key in keysValues) {
             switch (typeof keysValues[key]) {
                 case 'function':
-                    values[key] = keysValues[key]({ message, method: 'log' }) || ''
+                    values[key] = keysValues[key]({ message, method }) || ''
                     break
                 default:
                     values[key] = keysValues[key] || ''
@@ -180,9 +192,7 @@ export class Console<Template extends string = IDefautlTemplate> {
             const index = keys.findIndex(_key => _key.key == key)
             const params: ColorizeArgs = {}
 
-            if (index < 0) {
-                continue
-            }
+            if (index < 0) { continue }
 
             keys[index].params &&
                 keys[index].params?.forEach(param => {
@@ -199,9 +209,7 @@ export class Console<Template extends string = IDefautlTemplate> {
         keys.forEach(({ value, key }) => {
             const occurrence = this.getOccurrenceForCapture(template, key)
 
-            if (!occurrence) {
-                return
-            }
+            if (!occurrence) { return }
 
             template = template.substring(0, occurrence.initial) + value + template.substring(occurrence.final)
         })
@@ -258,7 +266,22 @@ export class Console<Template extends string = IDefautlTemplate> {
     log<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
         const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
 
-        return this.print(message, _config, _keysValues)
+        return this.print(message, 'log', _config, _keysValues)
+    }
+    warn<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
+        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+
+        return this.print(message, 'warn', _config, _keysValues)
+    }
+    error<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
+        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+
+        return this.print(message, 'error', _config, _keysValues)
+    }
+    info<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
+        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+
+        return this.print(message, 'info', _config, _keysValues)
     }
 
     clear() {
