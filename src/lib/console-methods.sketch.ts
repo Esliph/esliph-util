@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { ColorizeArgs, ColorsConsoleType, EnumColorsBackground, EnumColorsStyles, EnumColorsText, colorizeText } from '@util/color'
 
 /* eslint no-unused-expressions: ["off"] */
@@ -70,12 +71,38 @@ type KeysInput<T extends string> = Partial<KeysFormTemplate<ExtractKeys<T>>>
 
 const CAPTURE_KEY = new RegExp(`${EnumTemplateCharacters.open}(?!/?![a-zA-Z0-9])([^${EnumTemplateCharacters.close}]+)${EnumTemplateCharacters.close}`, 'g')
 
-type ConsoleConfigTemplates<Methods extends TEnumConsoleMethod = TEnumConsoleMethod, Template extends { [k in Methods]?: string } = Record<Methods, string>> = { [x in Methods]?: Template[x] }
+const TEMPLATE_LOG = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>'
+const TEMPLATE_ERROR = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=red>  <context?color=green&styles=bold>: <message>'
+const TEMPLATE_WARN = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=yellow&color=black>  <context?color=green&styles=bold>: <message>'
+const TEMPLATE_INFO = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=white>  <context?color=green&styles=bold>: <message>'
+
+const GLOBAL_DEFAULT_TEMPLATES = {
+    log: TEMPLATE_LOG,
+    error: TEMPLATE_ERROR,
+    warn: TEMPLATE_WARN,
+    info: TEMPLATE_INFO,
+}
+
+type TemplatesMethods<
+    TemplateLog extends string = typeof TEMPLATE_ERROR,
+    TemplateError extends string = typeof TEMPLATE_ERROR,
+    TemplateWarn extends string = typeof TEMPLATE_WARN,
+    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in TEnumConsoleMethod]?: x extends 'log' ? TemplateLog : x extends 'error' ? TemplateError : x extends 'warn' ? TemplateWarn : x extends 'info' ? TemplateInfo : never }
+
+type KeysValueTemplateMethods<
+    TemplateLog extends string = typeof TEMPLATE_ERROR,
+    TemplateError extends string = typeof TEMPLATE_ERROR,
+    TemplateWarn extends string = typeof TEMPLATE_WARN,
+    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in TEnumConsoleMethod]?: x extends 'log' ? KeysInput<TemplateLog> : x extends 'error' ? KeysInput<TemplateError> : x extends 'warn' ? KeysInput<TemplateWarn> : x extends 'info' ? KeysInput<TemplateInfo> : never }
 
 // Config
-type ConsoleConfig<T extends string, Templates extends string = any> = {
-    template?: T
-    templates?: Partial<Record<Templates, string>>
+type ConsoleConfig<
+    TemplateLog extends string = typeof TEMPLATE_ERROR,
+    TemplateError extends string = typeof TEMPLATE_ERROR,
+    TemplateWarn extends string = typeof TEMPLATE_WARN,
+    TemplateInfo extends string = typeof TEMPLATE_INFO
+> = {
+    templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
 }
 
 const getRegexForCapture = (target: string) => {
@@ -84,15 +111,7 @@ const getRegexForCapture = (target: string) => {
 
 const DEFAULT_TEMPLATE = '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>'
 
-const DEFAULT_TEMPLATES: ConsoleConfigTemplates = {
-    log: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=blue>  <context?color=green&styles=bold>: <message>',
-    error: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=red>  <context?color=green&styles=bold>: <message>',
-    warn: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=yellow&color=black>  <context?color=green&styles=bold>: <message>',
-    info: '<prefix?value="#"&styles=italic> [<pidName?value="Esliph"&color=green&styles=italic;bold>] <pidCode?color=green>  <dateTime>  <method?background=white>  <context?color=green&styles=bold>: <message>',
-}
-
 type IDefaultTemplate = typeof DEFAULT_TEMPLATE
-type IDefaultTemplates = typeof DEFAULT_TEMPLATES
 
 const DEFAULT_TEMPLATE_KEYS_NAME: KeysInput<IDefaultTemplate> = {
     dateTime: () => dateTimeFormatter.format(new Date(Date.now())).replace(', ', ' '),
@@ -101,36 +120,54 @@ const DEFAULT_TEMPLATE_KEYS_NAME: KeysInput<IDefaultTemplate> = {
     pidCode: process.pid,
 }
 
-function getDefaultConfig<T extends string>(args: { template?: T } = {}, keysValues: KeysInput<T> = {}) {
-    const config: ConsoleConfig<T> = {
-        template: args && args.template ? args.template : (DEFAULT_TEMPLATE as T),
-    }
-
-    const kv: KeysInput<T> = { ...DEFAULT_TEMPLATE_KEYS_NAME, ...keysValues } as KeysInput<T>
-
-    return { config, keysValues: kv }
+const DEFAULT_METHODS_VALUES: KeysValueTemplateMethods = {
+    log: { ...DEFAULT_TEMPLATE_KEYS_NAME },
+    error: { ...DEFAULT_TEMPLATE_KEYS_NAME },
+    warn: { ...DEFAULT_TEMPLATE_KEYS_NAME },
+    info: { ...DEFAULT_TEMPLATE_KEYS_NAME },
 }
 
-export class Console<Template extends string = IDefaultTemplate> {
-    private config: ConsoleConfig<Template>
-    private keysValues: KeysInput<Template>
+function getDefaultConfig<
+    TemplateLog extends string = typeof TEMPLATE_LOG,
+    TemplateError extends string = typeof TEMPLATE_ERROR,
+    TemplateWarn extends string = typeof TEMPLATE_WARN,
+    TemplateInfo extends string = typeof TEMPLATE_INFO
+>(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> } = {}, methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {}) {
+    const config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {
+        templates: args && args.templates ? _.merge(GLOBAL_DEFAULT_TEMPLATES, args.templates) : (GLOBAL_DEFAULT_TEMPLATES as TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>),
+    }
+
+    const mv: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(DEFAULT_METHODS_VALUES, methodsValue) as KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
+
+    return { config, methodsValue: mv }
+}
+
+export class Console<
+    TemplateLog extends string = typeof TEMPLATE_LOG,
+    TemplateError extends string = typeof TEMPLATE_ERROR,
+    TemplateWarn extends string = typeof TEMPLATE_WARN,
+    TemplateInfo extends string = typeof TEMPLATE_INFO,
+> {
+    private config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
+    private methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
     protected native: globalThis.Console = console
     static readonly native: globalThis.Console = console
 
-    constructor(args: { template?: Template } | null = {}, keysValues: KeysInput<Template> = {}) {
-        this.config = { ...getDefaultConfig<Template>(args || {}, keysValues).config, ...args }
-        this.keysValues = { ...getDefaultConfig<Template>(args || {}, keysValues).keysValues, ...keysValues }
+    constructor(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> } | null = {}, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>) {
+        this.config = _.merge(getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).config, args)
+        this.methodsValue = _.merge(getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).methodsValue, methodsValue)
     }
 
     // Util
-    private getConfig<T extends string = Template>(options: ConsoleConfig<T> = {}, keysValues: KeysInput<T> = {}) {
-        const configs = [this.config, options]
-        const kv = [this.keysValues, keysValues]
+    getConfig<
+        TemplateLog extends string = typeof TEMPLATE_LOG,
+        TemplateError extends string = typeof TEMPLATE_ERROR,
+        TemplateWarn extends string = typeof TEMPLATE_WARN,
+        TemplateInfo extends string = typeof TEMPLATE_INFO>(options: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {}, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>) {
+        const config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(this.config, options)
+        const methodValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(this.methodsValue, methodsValue)
 
-        const config: ConsoleConfig<T> = Object.assign({}, ...configs)
-        const keysValue: GenericType<T> = Object.assign({}, ...kv)
-
-        return { config, keysValues: keysValue }
+        return { config, methodsValue: methodValue }
     }
 
     private getOccurrenceForCapture(text: string, selector: string) {
@@ -141,14 +178,14 @@ export class Console<Template extends string = IDefaultTemplate> {
     }
 
     // Process
-    private print<T extends string>(message: any, method: string, config: ConsoleConfig<T>, keysValues: GenericType<T, any>) {
-        if (!config.template) { return null }
-
+    private print<T extends string, M extends TEnumConsoleMethod>(message: any, method: M, template: T, keysValues: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>[M]) {
         const values: Partial<GenericType<any>> = {}
 
         for (const key in keysValues) {
+            // @ts-expect-error
             switch (typeof keysValues[key]) {
                 case 'function':
+                    // @ts-expect-error
                     values[key] = keysValues[key]({ message, method }) || ''
                     break
                 default:
@@ -162,7 +199,7 @@ export class Console<Template extends string = IDefaultTemplate> {
 
         const kv = values as Partial<KeysFormTemplate<ExtractKeysName<T>>>
 
-        const templateProcessed = this.processTemplate({ template: config.template, keysValues: kv })
+        const templateProcessed = this.processTemplate({ template, keysValues: kv })
 
         this.native.log(templateProcessed)
 
@@ -256,25 +293,37 @@ export class Console<Template extends string = IDefaultTemplate> {
     }
 
     // UC
-    log<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
-        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+    log<T extends string = TemplateLog>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { log: template?.template } }, { log: keysValues })
 
-        return this.print(message, 'log', _config, _keysValues)
+        if (!_config.templates || !_config.templates['log']) { return }
+
+        // @ts-expect-error
+        return this.print(message, 'log', _config.templates['log'], methodsValue['log'])
     }
-    warn<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
-        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+    warn<T extends string = TemplateWarn>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { warn: template?.template } }, { warn: keysValues })
 
-        return this.print(message, 'warn', _config, _keysValues)
+        if (!_config.templates || !_config.templates['warn']) { return }
+
+        // @ts-expect-error
+        return this.print(message, 'warn', _config.templates['warn'], methodsValue['warn'])
     }
-    error<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
-        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+    error<T extends string = TemplateError>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { error: template?.template } }, { error: keysValues })
 
-        return this.print(message, 'error', _config, _keysValues)
+        if (!_config.templates || !_config.templates['error']) { return }
+
+        // @ts-expect-error
+        return this.print(message, 'error', _config.templates['error'], methodsValue['error'])
     }
-    info<T extends string = Template>(message?: any, config?: ConsoleConfig<T>, keysValues?: KeysInput<T>) {
-        const { config: _config, keysValues: _keysValues } = this.getConfig(config, keysValues)
+    info<T extends string = TemplateInfo>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { info: template?.template } }, { info: keysValues })
 
-        return this.print(message, 'info', _config, _keysValues)
+        if (!_config.templates || !_config.templates['info']) { return }
+
+        // @ts-expect-error
+        return this.print(message, 'info', _config.templates['info'], methodsValue['info'])
     }
 
     clear() {
