@@ -1,10 +1,13 @@
-import { TError } from '@esliph/util'
+export type ErrorLiphInfo = {
+    title: string
+    message: { message: string; origin?: string }[]
+}
 
-export class ErrorGeneral implements TError {
+export class ErrorLiph implements ErrorLiphInfo {
     title: string
     message: { message: string, origin?: string }[]
 
-    constructor({ message, title }: TError) {
+    constructor({ message, title }: ErrorLiphInfo) {
         this.title = title
         this.message = message
     }

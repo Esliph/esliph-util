@@ -7,11 +7,11 @@
     "private": false,
     "scripts": {
         "start": "node dist/index.js",
-        "dev": "tsx watch src/index.ts",
         "dev:console": "tsx watch src/@test/console.ts",
         "dev:color": "tsx watch src/@test/color.ts",
         "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
-        "build": "npx tsup src",
+        "build:tsup": "npx tsup src",
+        "build": "npx tsc",
         "valid:lint": "eslint \"**/*.ts\"",
         "fix:lint": "eslint --fix ."
     },
@@ -50,6 +50,7 @@
         "eslint": "^8.40.0",
         "eslint-config-prettier": "^8.8.0",
         "prettier": "^2.8.8",
+        "tsup": "^7.1.0",
         "tsx": "^3.12.7",
         "typescript": "^5.0.4"
     },
@@ -58,7 +59,6 @@
         "crypto": "^1.0.1",
         "dotenv": "^16.0.3",
         "lodash": "^4.17.21",
-        "tsup": "^6.7.0",
         "uuid": "^9.0.0"
     }
 }

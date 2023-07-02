@@ -1,5 +1,4 @@
-import { LocalStorageOptions } from '@esliph/util'
-
+// @ts-expect-error
 const dataLocal: Storage = (function () {
     const storage: { key: string, value: any }[] = []
 
@@ -53,7 +52,13 @@ const dataLocal: Storage = (function () {
     }
 }())
 
+export type LocalStorageOptions = {
+    inMemory?: boolean
+}
+
+// @ts-expect-error
 const getStorage: (local?: boolean) => Storage = (local = false) => {
+    // @ts-expect-error
     return !local ? localStorage : dataLocal
 }
 

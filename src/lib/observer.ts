@@ -1,4 +1,4 @@
-import { randomId } from '@lib/generate-id'
+import { randomId } from './generate-id'
 
 export type ObserverListener<Events> = {
     handler: (data: any) => void
