@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util",
-    "version": "1.0.19",
+    "version": "1.0.19.11",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
@@ -24,6 +24,7 @@
     },
     "files": [
         "/dist/lib",
+        "/dist/util",
         "/index.d.ts"
     ],
     "keywords": [],

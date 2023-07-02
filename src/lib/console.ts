@@ -45,14 +45,14 @@ const EnumConsoleMethod = {
     warn: 'warn',
 } as const
 
-type TEnumConsoleMethod = keyof typeof EnumConsoleMethod
+export type ConsoleMethod = keyof typeof EnumConsoleMethod
 
 // Template
 type GenericType<T extends string, U = any> = { [x in T]: U }
 
 type NativeTypes = Date | number | string | boolean | object | any[] | Function | bigint | null | undefined
 
-type KeysFormTemplate<T extends string> = GenericType<T, NativeTypes | ((args: { method: TEnumConsoleMethod; message: any }) => NativeTypes)>
+type KeysFormTemplate<T extends string> = GenericType<T, NativeTypes | ((args: { method: ConsoleMethod; message: any }) => NativeTypes)>
 
 type TemplateKeys<S extends string> =
     S extends `${typeof EnumTemplateCharacters.open}${infer KeyName}${typeof EnumTemplateCharacters.close}${infer RestAfter}`
@@ -87,13 +87,13 @@ type TemplatesMethods<
     TemplateLog extends string = typeof TEMPLATE_ERROR,
     TemplateError extends string = typeof TEMPLATE_ERROR,
     TemplateWarn extends string = typeof TEMPLATE_WARN,
-    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in TEnumConsoleMethod]?: x extends 'log' ? TemplateLog : x extends 'error' ? TemplateError : x extends 'warn' ? TemplateWarn : x extends 'info' ? TemplateInfo : never }
+    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in ConsoleMethod]?: x extends 'log' ? TemplateLog : x extends 'error' ? TemplateError : x extends 'warn' ? TemplateWarn : x extends 'info' ? TemplateInfo : never }
 
 type KeysValueTemplateMethods<
     TemplateLog extends string = typeof TEMPLATE_ERROR,
     TemplateError extends string = typeof TEMPLATE_ERROR,
     TemplateWarn extends string = typeof TEMPLATE_WARN,
-    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in TEnumConsoleMethod]?: x extends 'log' ? KeysInput<TemplateLog> : x extends 'error' ? KeysInput<TemplateError> : x extends 'warn' ? KeysInput<TemplateWarn> : x extends 'info' ? KeysInput<TemplateInfo> : never }
+    TemplateInfo extends string = typeof TEMPLATE_INFO> = { [x in ConsoleMethod]?: x extends 'log' ? KeysInput<TemplateLog> : x extends 'error' ? KeysInput<TemplateError> : x extends 'warn' ? KeysInput<TemplateWarn> : x extends 'info' ? KeysInput<TemplateInfo> : never }
 
 // Config
 type ConsoleConfig<
@@ -103,7 +103,7 @@ type ConsoleConfig<
     TemplateInfo extends string = typeof TEMPLATE_INFO
 > = {
     templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
-    levels?: TEnumConsoleMethod[]
+    levels?: ConsoleMethod[]
 }
 
 const getRegexForCapture = (target: string) => {
@@ -151,7 +151,7 @@ export class Console<
     protected native: globalThis.Console = console
     static readonly native: globalThis.Console = console
 
-    constructor(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>['log'], levels?: boolean | TEnumConsoleMethod | TEnumConsoleMethod[] } | null = {}, methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> | null = {}) {
+    constructor(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>['log'], levels?: boolean | ConsoleMethod | ConsoleMethod[] } | null = {}, methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> | null = {}) {
         this.config = _.merge({}, getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).config, args || {})
         this.methodsValue = _.merge({}, args && args.methodsValue ? {
             log: args.methodsValue,
@@ -197,12 +197,12 @@ export class Console<
         return match ? { value: match[0], initial: match.index, final: selectorRegex.lastIndex } : null
     }
 
-    private isEnablePrint(method: TEnumConsoleMethod) {
+    private isEnablePrint(method: ConsoleMethod) {
         return !!(this.config.levels && this.config.levels.find(mt => mt == method))
     }
 
     // Process
-    private print<T extends string, M extends TEnumConsoleMethod>(message: any, method: M, template: T, keysValues: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>[M]) {
+    private print<T extends string, M extends ConsoleMethod>(message: any, method: M, template: T, keysValues: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>[M]) {
         if (!this.isEnablePrint(method)) { return }
 
         const values: Partial<GenericType<any>> = {}

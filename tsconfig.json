@@ -22,15 +22,6 @@
         "experimentalDecorators": true,
         "resolveJsonModule": true,
         "emitDecoratorMetadata": true,
-        "baseUrl": ".",
-        "paths": {
-            "@lib/*": [
-                "src/lib/*"
-            ],
-            "@util/*": [
-                "src/util/*"
-            ]
-        }
     },
     "exclude": [
         "./dist",
