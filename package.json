@@ -1,16 +1,12 @@
 {
     "name": "@esliph/util",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
     "private": false,
     "scripts": {
         "start": "node dist/index.js",
-        "dev:console": "tsx watch src/@test/console.ts",
-        "dev:color": "tsx watch src/@test/color.ts",
-        "build:babel": "babel src --extensions \".js,.ts\" --out-dir dist --copy-files --no-copy-ignored",
-        "build:tsup": "npx tsup src",
         "build": "npx tsc",
         "valid:lint": "eslint \"**/*.ts\"",
         "fix:lint": "eslint --fix ."
