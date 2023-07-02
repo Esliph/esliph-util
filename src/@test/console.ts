@@ -2,7 +2,7 @@ import { Console } from '@lib/console-methods.sketch'
 
 Console.clear()
 
-const consoleLiph = new Console()
+const consoleLiph = new Console({ methodsValue: { context: '[Teste]' } })
 
 consoleLiph.log('Hello World')
 consoleLiph.error('Hello World')

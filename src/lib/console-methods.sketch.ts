@@ -134,10 +134,10 @@ function getDefaultConfig<
     TemplateInfo extends string = typeof TEMPLATE_INFO
 >(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> } = {}, methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {}) {
     const config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {
-        templates: args && args.templates ? _.merge(GLOBAL_DEFAULT_TEMPLATES, args.templates) : (GLOBAL_DEFAULT_TEMPLATES as TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>),
+        templates: args && args.templates ? _.merge({}, GLOBAL_DEFAULT_TEMPLATES, args.templates) : (GLOBAL_DEFAULT_TEMPLATES as TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>),
     }
 
-    const mv: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(DEFAULT_METHODS_VALUES, methodsValue) as KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
+    const mv: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge({}, DEFAULT_METHODS_VALUES, methodsValue) as KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
 
     return { config, methodsValue: mv }
 }
@@ -153,9 +153,14 @@ export class Console<
     protected native: globalThis.Console = console
     static readonly native: globalThis.Console = console
 
-    constructor(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> } | null = {}, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>) {
-        this.config = _.merge(getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).config, args)
-        this.methodsValue = _.merge(getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).methodsValue, methodsValue)
+    constructor(args: { templates?: TemplatesMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>['log'] } | null = {}, methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> | null = {}) {
+        this.config = _.merge({}, getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).config, args || {})
+        this.methodsValue = _.merge({}, args && args.methodsValue ? {
+            log: args.methodsValue,
+            error: args.methodsValue,
+            warn: args.methodsValue,
+            info: args.methodsValue
+        } : {}, getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).methodsValue, methodsValue || {})
     }
 
     // Util
@@ -164,8 +169,8 @@ export class Console<
         TemplateError extends string = typeof TEMPLATE_ERROR,
         TemplateWarn extends string = typeof TEMPLATE_WARN,
         TemplateInfo extends string = typeof TEMPLATE_INFO>(options: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = {}, methodsValue?: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>) {
-        const config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(this.config, options)
-        const methodValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge(this.methodsValue, methodsValue)
+        const config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge({}, this.config, options)
+        const methodValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> = _.merge({}, this.methodsValue, methodsValue)
 
         return { config, methodsValue: methodValue }
     }
@@ -293,32 +298,32 @@ export class Console<
     }
 
     // UC
-    log<T extends string = TemplateLog>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
-        const { config: _config, methodsValue } = this.getConfig({ templates: { log: template?.template } }, { log: keysValues })
+    log<T extends string = TemplateLog>(message?: any, template: { template?: T } | null = {}, keysValues: KeysInput<T> | null = {}) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { log: template?.template } }, { log: keysValues || {} })
 
         if (!_config.templates || !_config.templates['log']) { return }
 
         // @ts-expect-error
         return this.print(message, 'log', _config.templates['log'], methodsValue['log'])
     }
-    warn<T extends string = TemplateWarn>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
-        const { config: _config, methodsValue } = this.getConfig({ templates: { warn: template?.template } }, { warn: keysValues })
+    warn<T extends string = TemplateWarn>(message?: any, template: { template?: T } | null = {}, keysValues: KeysInput<T> | null = {}) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { warn: template?.template } }, { warn: keysValues || {} })
 
         if (!_config.templates || !_config.templates['warn']) { return }
 
         // @ts-expect-error
         return this.print(message, 'warn', _config.templates['warn'], methodsValue['warn'])
     }
-    error<T extends string = TemplateError>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
-        const { config: _config, methodsValue } = this.getConfig({ templates: { error: template?.template } }, { error: keysValues })
+    error<T extends string = TemplateError>(message?: any, template: { template?: T } | null = {}, keysValues: KeysInput<T> | null = {}) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { error: template?.template } }, { error: keysValues || {} })
 
         if (!_config.templates || !_config.templates['error']) { return }
 
         // @ts-expect-error
         return this.print(message, 'error', _config.templates['error'], methodsValue['error'])
     }
-    info<T extends string = TemplateInfo>(message?: any, template?: { template?: T }, keysValues?: KeysInput<T>) {
-        const { config: _config, methodsValue } = this.getConfig({ templates: { info: template?.template } }, { info: keysValues })
+    info<T extends string = TemplateInfo>(message?: any, template: { template?: T } | null = {}, keysValues: KeysInput<T> | null = {}) {
+        const { config: _config, methodsValue } = this.getConfig({ templates: { info: template?.template } }, { info: keysValues || {} })
 
         if (!_config.templates || !_config.templates['info']) { return }
 
