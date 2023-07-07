@@ -1,13 +1,18 @@
-import { ErrorLiphInfo } from './error'
-import { ErrorLiph } from './error'
+import { ErrorEsliphInfo } from './error'
+import { ErrorEsliph } from './error'
 
 export class Result<T = any> {
     private ok: boolean
     private status: number
     private value?: T
-    private error?: ErrorLiph
+    private error?: ErrorEsliph
 
-    private constructor({ ok, status, value, error, }: { ok: true; value: T; status: number; error?: undefined } | { ok: false; error: ErrorLiph; status: number; value?: undefined }) {
+    private constructor({
+        ok,
+        status,
+        value,
+        error,
+    }: { ok: true; value: T; status: number; error?: undefined } | { ok: false; error: ErrorEsliph; status: number; value?: undefined }) {
         this.ok = ok
         this.status = status
         if (ok) {
@@ -21,27 +26,27 @@ export class Result<T = any> {
         return new Result<T>({ ok: true, status: statusCode, value: successInfo })
     }
 
-    static failure<T>(errorInfo: ErrorLiphInfo, statusCode: number) {
-        return new Result<T>({ ok: false, error: new ErrorLiph(errorInfo), status: statusCode })
+    static failure<T>(errorInfo: ErrorEsliphInfo, statusCode: number) {
+        return new Result<T>({ ok: false, error: new ErrorEsliph(errorInfo), status: statusCode })
     }
 
     isSuccess() {
         return this.ok
     }
 
-    getResponse() {
+    getValue() {
         return this.value as T
     }
 
     getError() {
-        return this.error as ErrorLiph
+        return this.error as ErrorEsliph
     }
 
     getStatus() {
         return this.status
     }
 
-    getResult() {
-        return { ok: this.ok, status: this.status, value: this.value as T, error: this.error as ErrorLiph }
+    getResponse() {
+        return { ok: this.ok, status: this.status, value: this.value as T, error: this.error as ErrorEsliph }
     }
 }
