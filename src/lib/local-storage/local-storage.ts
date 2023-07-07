@@ -1,9 +1,15 @@
+import _ from 'lodash'
 import { LocalStorageMemory } from './memory'
 
 type Storage = LocalStorageMemory
 
 export type LocalStorageOptions = {
-    isMemory?: boolean
+    useMemory?: boolean
+    useMemoryWhenLocalNotEnable?: boolean
+}
+
+const DEFAULT_LOCAL_STORAGE_OPTIONS: LocalStorageOptions = {
+    useMemoryWhenLocalNotEnable: true,
 }
 
 export class LocalStorage {
@@ -12,7 +18,7 @@ export class LocalStorage {
     options: LocalStorageOptions
 
     constructor(options?: LocalStorageOptions) {
-        this.options = options || {}
+        this.options = _.merge({}, DEFAULT_LOCAL_STORAGE_OPTIONS, options)
     }
 
     createItem(key: string, value: any) {
@@ -68,10 +74,10 @@ export class LocalStorage {
     }
 
     updateOptions(options: LocalStorageOptions) {
-        this.options = { ...this.options, ...options }
+        this.options = _.merge({}, DEFAULT_LOCAL_STORAGE_OPTIONS, this.options, options)
     }
 
     private getStorage(): Storage {
-        return !this.options.isMemory ? LocalStorage.storageLocal : LocalStorage.storageMemory
+        return !this.options.useMemory || !this.options.useMemoryWhenLocalNotEnable ? LocalStorage.storageLocal : LocalStorage.storageMemory
     }
 }
