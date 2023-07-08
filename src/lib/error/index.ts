@@ -1,13 +1,13 @@
-export type ErrorEsliphInfo = {
+export type ErrorResultInfo = {
     title: string
     message: { message: string; origin?: string }[]
 }
 
-export class ErrorEsliph implements ErrorEsliphInfo {
-    title: string
-    message: { message: string; origin?: string }[]
+export class ErrorResult implements ErrorResultInfo {
+    readonly title: string
+    readonly message: { message: string; origin?: string }[]
 
-    constructor({ message, title }: ErrorEsliphInfo) {
+    constructor({ message, title }: ErrorResultInfo) {
         this.title = title
         this.message = message
     }

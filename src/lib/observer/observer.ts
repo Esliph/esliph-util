@@ -1,7 +1,7 @@
-import { ObserverCore as ObsCore } from './core'
+import { ObserverCore } from './core'
 
 export class ObserverEvent<Context extends string, EventsName extends object = {}> {
-    public static ObserverCore = new ObsCore()
+    public static observerCore = new ObserverCore()
     private context: string
 
     constructor(context: Context) {
@@ -9,68 +9,68 @@ export class ObserverEvent<Context extends string, EventsName extends object = {
     }
 
     public on<Event extends keyof EventsName>(eventName: Event, handler: (data: EventsName[Event]) => void) {
-        return ObserverEvent.ObserverCore.onWithContext(eventName, handler, this.context)
+        return ObserverEvent.observerCore.onWithContext(eventName, handler, this.context)
     }
 
-    public onMaint<Event extends keyof EventsName>(eventName: Event, handler: (data: EventsName[Event]) => void) {
-        return ObserverEvent.ObserverCore.onMainWithContext(eventName, handler, this.context)
+    public onMain<Event extends keyof EventsName>(eventName: Event, handler: (data: EventsName[Event]) => void) {
+        return ObserverEvent.observerCore.onMainWithContext(eventName, handler, this.context)
     }
 
     public async emitToEvent<Event extends keyof EventsName>(eventName: Event, data: EventsName[Event]) {
-        await ObserverEvent.ObserverCore.emitToContextAndEvent(this.context, eventName, data)
+        await ObserverEvent.observerCore.emitToContextAndEvent(this.context, eventName, data)
     }
 
     public async emitToCode<Event extends keyof EventsName>(code: number, data: EventsName[Event]) {
-        await ObserverEvent.ObserverCore.emitToContextAndCode(this.context, code, data)
+        await ObserverEvent.observerCore.emitToContextAndCode(this.context, code, data)
     }
 
     public removeListenerByCode(code: number) {
-        ObserverEvent.ObserverCore.removeListenerByContextAndCode(this.context, code)
+        ObserverEvent.observerCore.removeListenerByContextAndCode(this.context, code)
     }
 
     public removeListenersByEvent<Event extends keyof EventsName>(eventName: Event) {
-        ObserverEvent.ObserverCore.removeListenersByContextAndEvent(this.context, eventName)
+        ObserverEvent.observerCore.removeListenersByContextAndEvent(this.context, eventName)
     }
 
     public removeListenerMainByCode(code: number) {
-        ObserverEvent.ObserverCore.removeListenerMainByContextAndCode(this.context, code)
+        ObserverEvent.observerCore.removeListenerMainByContextAndCode(this.context, code)
     }
 
     public removeListenersMainByEvent<Event extends keyof EventsName>(eventName: Event) {
-        ObserverEvent.ObserverCore.removeListenersMainByContextAndEvent(this.context, eventName)
+        ObserverEvent.observerCore.removeListenersMainByContextAndEvent(this.context, eventName)
     }
 
     // Query
     public getListenersByEvent<Event extends keyof EventsName>(eventName: Event) {
-        return ObserverEvent.ObserverCore.getListenersByContextAndEvent(this.context, eventName)
+        return ObserverEvent.observerCore.getListenersByContextAndEvent(this.context, eventName)
     }
 
     public getListeners() {
-        return ObserverEvent.ObserverCore.getListenersByContext(this.context)
+        return ObserverEvent.observerCore.getListenersByContext(this.context)
     }
 
     public getListenerByCode(codeEvent: number) {
-        return ObserverEvent.ObserverCore.getListenerByContextAndCode(this.context, codeEvent)
+        return ObserverEvent.observerCore.getListenerByContextAndCode(this.context, codeEvent)
     }
 
     public getIndexListenerByCode(codeEvent: number) {
-        return ObserverEvent.ObserverCore.getIndexListenerByContextAndCode(this.context, codeEvent)
+        return ObserverEvent.observerCore.getIndexListenerByContextAndCode(this.context, codeEvent)
     }
 
     public getListenersMainByEvent<Event extends keyof EventsName>(eventName: Event) {
-        return ObserverEvent.ObserverCore.getListenersMainByContextAndEvent(this.context, eventName)
+        return ObserverEvent.observerCore.getListenersMainByContextAndEvent(this.context, eventName)
     }
 
     public getListenerMainByCode(codeEvent: number) {
-        return ObserverEvent.ObserverCore.getListenerMainByContextAndCode(this.context, codeEvent)
+        return ObserverEvent.observerCore.getListenerMainByContextAndCode(this.context, codeEvent)
     }
 
     public getIndexListenerMainByCode(codeEvent: number) {
-        return ObserverEvent.ObserverCore.getIndexListenerMainByCode(codeEvent)
+        return ObserverEvent.observerCore.getIndexListenerMainByCode(codeEvent)
     }
 
-    get ObserverCore() {
-        return ObserverEvent.ObserverCore
+    get observerCore() {
+        return ObserverEvent.observerCore
     }
 
     public getContext() {

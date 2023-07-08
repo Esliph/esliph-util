@@ -1,4 +1,4 @@
-import { randomId } from '../generate-id'
+import { randomIdIntWithDate } from '../random'
 
 export type ObserverListenerModuleEvent = any
 
@@ -17,7 +17,7 @@ export class ObserverListener implements ObserverListenerImp {
     public context: string
     public main: boolean
 
-    private constructor(event: ObserverListenerModuleEvent, handler: (data: any) => void, code: number, context: string = '', main: boolean = false) {
+    private constructor(event: ObserverListenerModuleEvent, handler: (data: any) => void, code: number, context = '', main = false) {
         this.handler = handler
         this.event = event
         this.code = code
@@ -26,7 +26,7 @@ export class ObserverListener implements ObserverListenerImp {
     }
 
     public static onWithoutContext(event: ObserverListenerModuleEvent, handler: (data: any) => void) {
-        const codeListenerWithoutContext = randomId.int()
+        const codeListenerWithoutContext = randomIdIntWithDate()
 
         const listenerWithoutContext = new ObserverListener(event, handler, codeListenerWithoutContext, '', false)
 
@@ -34,7 +34,7 @@ export class ObserverListener implements ObserverListenerImp {
     }
 
     public static onWithContext(event: ObserverListenerModuleEvent, handler: (data: any) => void, context: string) {
-        const codeListenerWithContext = randomId.int()
+        const codeListenerWithContext = randomIdIntWithDate()
 
         const listenerWithContext = new ObserverListener(event, handler, codeListenerWithContext, context, false)
 
@@ -42,7 +42,7 @@ export class ObserverListener implements ObserverListenerImp {
     }
 
     public static onMainWithoutContext(event: ObserverListenerModuleEvent, handler: (data: any) => void) {
-        const codeListenerWithoutContext = randomId.int()
+        const codeListenerWithoutContext = randomIdIntWithDate()
 
         const listenerWithoutContext = new ObserverListener(event, handler, codeListenerWithoutContext, '', true)
 
@@ -50,7 +50,7 @@ export class ObserverListener implements ObserverListenerImp {
     }
 
     public static onMainWithContext(event: ObserverListenerModuleEvent, handler: (data: any) => void, context: string) {
-        const codeListenerWithContext = randomId.int()
+        const codeListenerWithContext = randomIdIntWithDate()
 
         const listenerWithContext = new ObserverListener(event, handler, codeListenerWithContext, context, true)
 

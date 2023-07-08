@@ -52,13 +52,11 @@ export class LocalStorage {
 
     getItem<T>(key: string): T | null {
         try {
-            const value = this.getStorage().getItem(key)
+            const valueItem = this.getStorage().getItem(key)
 
-            if (!value) {
-                return null
-            }
+            if (!valueItem) { return null }
 
-            return value
+            return valueItem
         } catch (err) {
             return null
         }
@@ -78,6 +76,10 @@ export class LocalStorage {
     }
 
     private getStorage(): Storage {
-        return !this.options.useMemory || !this.options.useMemoryWhenLocalNotEnable ? LocalStorage.storageLocal : LocalStorage.storageMemory
+        if (!this.options.useMemory || !this.options.useMemoryWhenLocalNotEnable) {
+            return LocalStorage.storageLocal
+        }
+
+        return LocalStorage.storageMemory
     }
 }

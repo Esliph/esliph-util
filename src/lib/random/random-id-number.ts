@@ -1,4 +1,4 @@
-export function randomIdInt() {
+export function randomIdIntWithDate() {
     const VALUE_MAX = 9999
     const now = new Date()
 

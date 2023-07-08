@@ -1,23 +1,17 @@
 import 'dotenv/config'
 
-export function getEnv<T>({
-    name,
-    default: defaultValue,
-    forceDefault = false,
-    production = false,
-}: {
-    name: string
-    default?: T
-    forceDefault?: boolean
-    production?: boolean
-}) {
+export type GetEnvArgs<DefaultType> = { name: string, defaultValue?: DefaultType, forceDefaultValue?: boolean, defaultValueInProduction?: boolean }
+
+export function getEnv<DefaultType>({ name, defaultValue, forceDefaultValue = false, defaultValueInProduction = false }: GetEnvArgs<DefaultType>) {
     if (process.env['ENVIRONMENT'] == 'PRODUCTION') {
-        return !production
-            ? process.env[`${name}`] || ''
-            : !forceDefault
-            ? process.env[`${name}`] || defaultValue || ''
-            : defaultValue || process.env[`${name}`] || ''
+        if (!defaultValueInProduction) {
+            return process.env[`${name}`] || ''
+        }
     }
 
-    return !forceDefault ? process.env[`${name}`] || defaultValue || '' : defaultValue || process.env[`${name}`] || ''
+    if (!forceDefaultValue) {
+        return process.env[`${name}`] || defaultValue || ''
+    }
+
+    return defaultValue || process.env[`${name}`] || ''
 }

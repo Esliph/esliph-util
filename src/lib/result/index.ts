@@ -1,18 +1,17 @@
-import { ErrorEsliphInfo } from '../error'
-import { ErrorEsliph } from '../error'
+import { ErrorResultInfo, ErrorResult } from '../error'
 
 export type ResultModel<ResultValueModel = any> = {
     ok: boolean
     status: number
     value: ResultValueModel | null
-    error: ErrorEsliph | null
+    error: ErrorResult | null
 }
 
 export class Result<ResultValueModel = any> {
-    private ok: boolean
-    private status: number
-    private value: ResultValueModel | null
-    private error: ErrorEsliph | null
+    private readonly ok: boolean
+    private readonly status: number
+    private readonly value: ResultValueModel | null
+    private readonly error: ErrorResult | null
 
     private constructor({ ok, status, value, error }: ResultModel<ResultValueModel>) {
         this.ok = ok
@@ -25,8 +24,8 @@ export class Result<ResultValueModel = any> {
         return new Result<ResultValueModel>({ ok: true, status: statusCode, value: successInfo, error: null })
     }
 
-    static failure<ResultValueModel = any>(errorInfo: ErrorEsliphInfo, statusCode = 400) {
-        return new Result<ResultValueModel>({ ok: false, status: statusCode, error: new ErrorEsliph(errorInfo), value: null })
+    static failure<ResultValueModel = any>(errorInfo: ErrorResultInfo, statusCode = 400) {
+        return new Result<ResultValueModel>({ ok: false, status: statusCode, error: new ErrorResult(errorInfo), value: null })
     }
 
     isSuccess() {
@@ -38,7 +37,7 @@ export class Result<ResultValueModel = any> {
     }
 
     getError() {
-        return this.error as ErrorEsliph
+        return this.error as ErrorResult
     }
 
     getStatus() {
@@ -46,6 +45,6 @@ export class Result<ResultValueModel = any> {
     }
 
     getResponse() {
-        return { ok: this.ok, status: this.status, value: this.value as ResultValueModel, error: this.error as ErrorEsliph }
+        return { ok: this.ok, status: this.status, value: this.value as ResultValueModel, error: this.error as ErrorResult }
     }
 }

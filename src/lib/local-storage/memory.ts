@@ -1,9 +1,15 @@
-interface Storage {}
+export interface LocalStorageMemoryImp {
+    setItem(key: string, value: any): void
+    getItem(keyName: string): any
+    clear(): void
+    removeItem(keyName: string): void
+    key(indexItem: number): any
+}
 
-export class LocalStorageMemory implements Storage {
+export class LocalStorageMemory implements LocalStorageMemoryImp {
     private static storage: { key: string; value: any }[] = []
 
-    constructor() {}
+    constructor() { }
 
     setItem(key: string, value: any) {
         this.removeItem(key)
