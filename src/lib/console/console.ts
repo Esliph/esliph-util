@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { ColorizeArgs, ColorsConsoleType, colorizeText } from '../../util/color'
-import { ObserverEvent } from '../observer'
 import { EnumCliColors, EnumTemplateCharacters, EnumTemplateParams, ConsoleMethod, ConsoleEvents, ExtractKeysName, GenericType, KeysFormTemplate, KeysInput } from './global'
 import { TEMPLATE_ERROR, TEMPLATE_INFO, TEMPLATE_LOG, TEMPLATE_WARN, KeysValueTemplateMethods, TemplatesMethods } from './default'
 import { ConsoleConfig, getDefaultConfig, getRegexForCapture, CAPTURE_KEY } from './helpers'
@@ -12,11 +11,10 @@ export class Console<
     TemplateError extends string = typeof TEMPLATE_ERROR,
     TemplateWarn extends string = typeof TEMPLATE_WARN,
     TemplateInfo extends string = typeof TEMPLATE_INFO
-> extends ObserverEvent<'Console', ConsoleEvents> {
+> {
     protected config: ConsoleConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
     protected methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>
     static readonly native: globalThis.Console = console
-    static observer = new ObserverEvent<'Console', ConsoleEvents>('Console')
 
     constructor(
         args: {
@@ -26,7 +24,6 @@ export class Console<
         } | null = {},
         methodsValue: KeysValueTemplateMethods<TemplateLog, TemplateError, TemplateWarn, TemplateInfo> | null = {}
     ) {
-        super('Console')
         this.config = _.merge({}, getDefaultConfig<TemplateLog, TemplateError, TemplateWarn, TemplateInfo>(args || {}, methodsValue || {}).config, args || {})
         this.methodsValue = _.merge(
             {},
@@ -120,9 +117,6 @@ export class Console<
         const templateProcessed = this.processTemplate({ template, keysValues: kv })
 
         Console.native.log(templateProcessed)
-
-        Console.observer.observerCore.emitToEvent(method, templateProcessed)
-        this.emitToEvent(method, templateProcessed)
 
         return templateProcessed
     }
