@@ -1,0 +1,9 @@
+.npmignore
+.eslintignore
+.eslintrc
+.prettierignore
+.prettierrc
+.gitignore
+node_modules
+public
+src
