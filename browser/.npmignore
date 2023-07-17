@@ -5,5 +5,4 @@
 .prettierrc
 .gitignore
 node_modules
-public
 src
