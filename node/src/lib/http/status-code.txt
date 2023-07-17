@@ -1,0 +1,48 @@
+100 Continue: O servidor recebeu os cabeçalhos da solicitação e aguarda que o cliente envie o corpo da solicitação.
+101 Switching Protocols: O servidor concorda em trocar os protocolos solicitados na solicitação.
+102 Processing: O servidor está processando a solicitação, mas ainda não concluiu o processo.
+103 Early Hints: O servidor está retornando dicas adicionais antes de enviar a resposta final.
+200 OK: A solicitação foi bem-sucedida e o servidor retornou os dados solicitados.
+201 Created: A solicitação foi bem-sucedida, e um novo recurso foi criado como resultado.
+202 Accepted: A solicitação foi aceita para processamento, mas ainda não foi concluída.
+203 Non-Authoritative Information: A resposta é uma representação intermediária de um recurso retornado por um servidor externo.
+204 No Content: A solicitação foi bem-sucedida, mas não há informações para enviar no corpo da resposta.
+205 Reset Content: A solicitação foi bem-sucedida, mas o cliente deve redefinir a visualização do documento.
+206 Partial Content: A parte da solicitação foi bem-sucedida, retornando apenas os dados solicitados.
+300 Multiple Choices: A solicitação tem mais de uma resposta possível.
+301 Moved Permanently: O recurso solicitado foi movido permanentemente para uma nova URL.
+302 Found: O recurso solicitado foi temporariamente movido para uma nova URL.
+303 See Other: A resposta à solicitação pode ser encontrada em uma nova URL especificada na resposta.
+304 Not Modified: O recurso não foi modificado desde a última solicitação.
+307 Temporary Redirect: O recurso solicitado foi temporariamente movido para uma nova URL.
+308 Permanent Redirect: O recurso solicitado foi movido permanentemente para uma nova URL.
+400 Bad Request: A solicitação foi malformada ou não pôde ser entendida pelo servidor.
+401 Unauthorized: A autenticação é necessária para obter a resposta solicitada.
+402 Payment Required: Reservado para uso futuro.
+403 Forbidden: O servidor entende a solicitação, mas se recusa a autorizá-la.
+404 Not Found: O recurso solicitado não foi encontrado no servidor.
+405 Method Not Allowed: O método de solicitação utilizado não é suportado para o recurso especificado.
+406 Not Acceptable: O servidor não é capaz de produzir uma resposta que atenda aos critérios de negociação definidos pelo cliente.
+407 Proxy Authentication Required: O cliente deve primeiro autenticar-se com o proxy.
+408 Request Timeout: O servidor encerrou a solicitação porque o cliente não concluiu a solicitação dentro do tempo necessário.
+409 Conflict: A solicitação não pôde ser concluída devido a um conflito com o estado atual do recurso.
+410 Gone: O recurso solicitado não está mais disponível e não será novamente.
+411 Length Required: O comprimento da solicitação não foi definido e é obrigatório.
+412 Precondition Failed: Uma ou mais condições definidas na solicitação não foram atendidas.
+413 Payload Too Large: A solicitação é maior do que o servidor pode processar.
+414 URI Too Long: A URI da solicitação é maior do que o servidor pode processar.
+415 Unsupported Media Type: O formato da solicitação não é suportado pelo servidor.
+416 Range Not Satisfiable: O intervalo especificado na solicitação não é satisfatório.
+417 Expectation Failed: O servidor não consegue atender aos requisitos do cabeçalho Expect da solicitação.
+418 I'm a teapot: Essa é uma brincadeira do protocolo HTTP, não é usado comumente.
+421 Misdirected Request: A solicitação foi direcionada a um servidor inapto para produzir a resposta.
+422 Unprocessable Entity: A solicitação está bem formada, mas não pode ser seguida devido a erros semânticos.
+424 Failed Dependency: A solicitação falhou devido a falha em requisições anteriores.
+428 Precondition Required: O servidor requer que a solicitação seja condicional.
+429 Too Many Requests: O usuário enviou muitas solicitações em um determinado período de tempo.
+500 Internal Server Error: O servidor encontrou uma situação inesperada que o impediu de atender à solicitação.
+501 Not Implemented: O servidor não suporta a funcionalidade necessária para atender à solicitação.
+502 Bad Gateway: O servidor, enquanto atuando como gateway ou proxy, recebeu uma resposta inválida do servidor upstream.
+503 Service Unavailable: O servidor não está pronto para lidar com a solicitação. Geralmente, isso é devido a sobrecarga temporária ou manutenção do servidor.
+504 Gateway Timeout: O servidor, enquanto atuando como gateway ou proxy, não recebeu uma resposta oportuna do servidor upstream.
+505 HTTP Version Not Supported: A versão do HTTP utilizada na solicitação não é suportada pelo servidor.

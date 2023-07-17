@@ -6,7 +6,7 @@ export * as ResultEsliph from './result'
 export * as VarEnvEsliph from './var-env'
 export * as FlagEsliph from './flag-cli'
 export * as ConsoleEsliph from './console'
-export * as HTTPEsliph from './http'
+export * as HttpEsliph from './http'
 
 export { ErrorResult } from './error'
 export {} from './random'
