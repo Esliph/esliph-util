@@ -28,6 +28,10 @@ export class Result<ResultValueModel = any> {
         return new Result<ResultValueModel>({ ok: false, status: statusCode, error: new ErrorResult(errorInfo), value: null })
     }
 
+    static inherit<ResultValueModelInherited = any>({ ok, status, value, error }: ResultModel<ResultValueModelInherited>) {
+        return new Result<ResultValueModelInherited>({ ok, status, error, value })
+    }
+
     isSuccess() {
         return this.ok
     }
