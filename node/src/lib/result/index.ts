@@ -13,7 +13,7 @@ export class Result<ResultValueModel = any> {
     private readonly value: ResultValueModel | null
     private readonly error: ErrorResult | null
 
-    private constructor({ ok, status, value, error }: ResultModel<ResultValueModel>) {
+    constructor({ ok, status, value, error }: ResultModel<ResultValueModel>) {
         this.ok = ok
         this.status = status
         this.value = value
