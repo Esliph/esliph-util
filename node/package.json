@@ -13,8 +13,7 @@
         "dev:exception": "tsx watch src/test/exception.ts",
         "setup:dev:observer": "rm -r dist && npm run build && node dist/test/observer.js",
         "setup:dev:local-storage": "rm -r dist && npm run build && node dist/test/local-storage.js",
-        "build:dev": "npx tsc",
-        "build": "rm -r dist && npx tsc"
+        "build": "npx tsc"
     },
     "repository": {
         "url": "git+https://github.com/Danrley-Ruan-Saquetti/util.git"
