@@ -1,4 +1,4 @@
-import { ErrorResult } from "../error";
+import { ErrorResult } from '../error'
 
 export interface ResultExceptionModel extends ErrorResult {
     status?: number

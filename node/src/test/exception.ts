@@ -1,4 +1,4 @@
-import { ResultException } from './../lib/exception/index';
+import { ResultException } from './../lib/exception/index'
 
 const error = new ResultException({
     message: 'Error example'
@@ -22,7 +22,7 @@ try {
         console.log(e)
     }
 
-    console.log("-----------")
+    console.log('-----------')
 
     throw e
 }
