@@ -30,7 +30,7 @@ export class ResultException extends Error implements ResultExceptionModel {
         this.causes = causes
     }
 
-    getError() { return { message: this.message, title: this.title, description: this.description, status: this.status } }
+    getError() { return { message: this.message, title: this.title, description: this.description, status: this.status, causes: this.causes } }
     getTitle() { return this.title }
     getMessage() { return this.message }
     getDescription() { return this.description || null }
