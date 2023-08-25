@@ -90,11 +90,9 @@ export function performOperatorProp<Value, ValueOp>(value: Value, valueOperator:
 }
 
 function getOperatorsByType(value: any, type: keyof typeof OperatorsProps) {
-    const typeOfValueName: keyof typeof RelationOperatorByType = (!Array.isArray(value)
-        ? !(value instanceof Date)
-            ? `${typeof value}`.substring(0, 1).toUpperCase() + `${typeof value}`.substring(1)
-            : 'Date'
-        : 'Array') as keyof typeof RelationOperatorByType
+    const typeOfValueName: keyof typeof RelationOperatorByType = (
+        !Array.isArray(value) ? (!(value instanceof Date) ? `${typeof value}`.substring(0, 1).toUpperCase() + `${typeof value}`.substring(1) : 'Date') : 'Array'
+    ) as keyof typeof RelationOperatorByType
 
     if (!OPERATORS_TYPES[typeOfValueName]) {
         return null

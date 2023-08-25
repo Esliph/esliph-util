@@ -3,7 +3,7 @@ import { Operators, OperatorsProps, OrderBy, RelationOperatorByType } from './co
 import { ArrayFilter, BooleanFilter, DateFilter, DefaultFilter, NumberFilter, StringFilter } from './query'
 
 type ReplaceTypeValueOfObjet<O extends object, V> = { [x in keyof O]: O[x] extends Date ? V : O[x] extends object ? ReplaceTypeValueOfObjet<O[x], V> : V }
-type ExtractPropsInPayload<O extends object, V> = { [x in keyof O]: O[x] extends Date ? V : O[x] extends object ? ExtractPropsInPayload<O[x], V> | V : V }
+type ExtractPropsInPayload<O extends object, V> = { [x in keyof O]?: O[x] extends Date ? V : O[x] extends object ? ExtractPropsInPayload<O[x], V> | V : V }
 type RemovePropArray<O extends object> = { [x in keyof O]: O[x] extends Array<any> ? never : O[x] }
 
 type GetTypeOperatorByType<T> = T extends string
@@ -42,7 +42,9 @@ export type Document<ModelType extends DocumentDefaultArgs = {}> = ModelType & {
 export type ModelRepository = { documents: Document[]; lastId: number }
 export type ModelsRepository = { [x: string]: ModelRepository }
 export type ModelArgs<M extends DocumentDefaultArgs> = Document<M>
-export type ModelPayloadArgs<M extends Document, S extends SelectArgs<M>> = { [x in keyof S]: M[x] }
+export type ModelPayloadArgs<M extends Document, S extends SelectArgs<M>> = {
+    [x in keyof S]: M[x] extends Array<any> ? M[x] : M[x] extends Date ? M[x] : M[x] extends object ? ModelPayloadArgs<M[x], M[x]> : M[x]
+}
 
 export type OrderByArgs<M extends Document> = PartialDeep<RemovePropArray<ReplaceTypeValueOfObjet<M, OrderByType>>>
 export type LimitArgs = number
@@ -50,16 +52,17 @@ export type SelectArgs<M extends Document> = PartialDeep<ExtractPropsInPayload<M
 
 export type FindDefaultModelArgs<M extends object> = {
     [x in keyof M]: M[x] extends Array<any>
-    ? Partial<GetTypeOperatorByType<M[x]>>
-    : M[x] extends Date
-    ? Partial<GetTypeOperatorByType<M[x]>>
-    : M[x] extends object
-    ? FindDefaultModelArgs<M[x]>
-    : Partial<GetTypeOperatorByType<M[x]>>
+        ? Partial<GetTypeOperatorByType<M[x]>>
+        : M[x] extends Date
+        ? Partial<GetTypeOperatorByType<M[x]>>
+        : M[x] extends object
+        ? FindDefaultModelArgs<M[x]>
+        : Partial<GetTypeOperatorByType<M[x]>>
 }
 export type FindOperatorsArgs<M extends Document> = FindDefaultArgs<M>[]
 export type FindDefaultArgs<M extends Document> = PartialDeep<FindDefaultModelArgs<M>> & { [x in OperatorsType]?: FindOperatorsArgs<M> }
-export type FindArgs<M extends Document> = { where: FindDefaultArgs<M>; select?: SelectArgs<M> }
+export type FindDefaultResponse<M extends Document, S extends SelectArgs<M>> = ModelPayloadArgs<M, S>
+export type FindArgs<M extends Document> = { where: FindDefaultArgs<M> }
 export type FindFirstArgs<M extends Document> = FindArgs<M>
 export type FindFirstResponse<M extends DocumentDefaultArgs> = Document<M> | null
 export type FindIndexArgs<M extends Document> = FindArgs<M>

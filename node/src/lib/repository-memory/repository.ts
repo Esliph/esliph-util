@@ -1,4 +1,7 @@
-import { Types, Constants, validQueryToDocument } from './helpers'
+import { Types, validQueryToDocument } from './helpers'
+import { createDocument } from './helpers/create'
+import { limitDocumentsResult } from './helpers/limit'
+import { sortDocuments } from './helpers/sort'
 import {
     CreateManyResponse,
     CreateResponse,
@@ -100,22 +103,11 @@ export class Repository {
     // # Operational
     // ## Create
     private createAndPerformInsertDocument<M extends Types.DocumentDefaultArgs>(name: string, args: Types.CreateArgs<M>) {
-        const document = this.createDocument(name, args)
+        const id = this.updateAndGetLastId(name)
+        const document = createDocument(args, id)
         this.insertDocumentInModel(name, document)
 
         return document
-    }
-
-    @Repository.DeepClone()
-    private createDocument<M extends Types.DocumentDefaultArgs>(name: string, args: Types.CreateArgs<M>) {
-        const id = this.updateAndGetLastId(name)
-        const dateOfCreation = new Date(Date.now())
-
-        return deepMerge({}, args.data, {
-            id,
-            createAt: dateOfCreation,
-            updateAt: dateOfCreation,
-        }) as Types.Document<M>
     }
 
     private insertDocumentInModel<M extends Types.DocumentDefaultArgs>(name: string, doc: Types.Document<M>) {
@@ -168,8 +160,6 @@ export class Repository {
             return
         }
 
-        console.log(this.models[name].documents[index].id)
-
         this.models[name].documents.splice(index, 1)
     }
 
@@ -198,7 +188,7 @@ export class Repository {
                 const modelName = args[orderParam] || {}
 
                 if (!Repository.modelExists(modelName)) {
-                    throw new Error(`Types.Document name${modelName ? ` "${modelName}"` : ''} not define`)
+                    throw new Error(`Model name${modelName ? ` "${modelName}"` : ''} not define`)
                 }
 
                 const result = originalMethod.apply(this, args)
@@ -246,62 +236,11 @@ export class Repository {
                     orderBy = [orderBy]
                 }
 
-                return Repository.sortDocuments(result, orderBy || [{ id: 'DESC' }])
+                return sortDocuments(result, orderBy || [{ id: 'DESC' }])
             }
 
             return descriptor
         }
-    }
-
-    private static sortDocuments<M extends Types.DocumentDefaultArgs>(documents: Types.Document<M>[], args: Types.OrderByArgs<Types.Document<M>>[]) {
-        return documents.sort((doc1, doc2) => {
-            for (let i = 0; i < args.length; i++) {
-                const arg = args[i]
-                const propName = Object.keys(args[i])[0]
-
-                const sortResult = this.sortData(doc1, doc2, arg, propName)
-
-                if (sortResult != 0) {
-                    return sortResult
-                }
-            }
-
-            return -1
-        })
-    }
-
-    private static sortData<M extends Types.DocumentDefaultArgs>(
-        doc1: any,
-        doc2: any,
-        arg: any,
-        prop: string
-    ): any {
-        if (typeof arg[prop] == 'object') {
-            return this.sortData(doc1[prop], doc2[prop], arg[prop], Object.keys(arg[prop])[0])
-        }
-
-        if (arg[prop] == Constants.OrderBy.ASC) {
-            return this.sortPropData(doc1[prop], doc2[prop])
-        }
-
-        return this.sortPropData(doc2[prop], doc1[prop])
-    }
-
-    private static sortPropData(val1: any, val2: any) {
-        if (typeof val1 == 'number') {
-            return val1 - val2
-        }
-
-        if (val1 instanceof Date) {
-            // @ts-expect-error
-            return val1 - val2
-        }
-
-        if (typeof val1 == 'string') {
-            return val1.localeCompare(val2)
-        }
-
-        return val1 - val2
     }
 
     // ## Limit
@@ -318,15 +257,11 @@ export class Repository {
                     return result
                 }
 
-                return Repository.limitDocumentsResult(result, limit)
+                return limitDocumentsResult(result, limit)
             }
 
             return descriptor
         }
-    }
-
-    private static limitDocumentsResult<M extends Types.DocumentDefaultArgs>(documents: Types.Document<M>[], limit: Types.LimitArgs) {
-        return documents.splice(0, limit)
     }
 
     // # Model

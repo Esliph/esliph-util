@@ -1,6 +1,5 @@
 export * from './operator'
 import { Constants, Types } from '..'
-import { PartialDeep } from '../../util'
 import { OperatorsProps } from '../constants'
 import { performOperatorProp } from './operator'
 
@@ -27,7 +26,9 @@ export function validQueryToDocument<M extends Types.DocumentDefaultArgs>(doc: T
             continue
         }
 
-        if (!performValidConditionToDocument(docPropArg, propArg)) {
+        const result = performValidConditionToDocument(docPropArg, propArg)
+
+        if (!result) {
             return false
         }
     }
@@ -39,11 +40,7 @@ function isOperator(operator: keyof typeof Constants.Operators) {
     return !!Constants.Operators[operator]
 }
 
-function performOperator<M extends Types.DocumentDefaultArgs>(
-    operator: any,
-    doc: any,
-    args: any[]
-) {
+function performOperator<M extends Types.DocumentDefaultArgs>(operator: any, doc: any, args: any[]) {
     if (args.length == 0) {
         return true
     }
@@ -96,10 +93,7 @@ function validOperatorInFinal(operator: Types.OperatorsType) {
     }
 }
 
-function performValidConditionToDocument<M extends Types.DocumentDefaultArgs>(
-    docProp: any,
-    argProp: any
-) {
+function performValidConditionToDocument<M extends Types.DocumentDefaultArgs>(docProp: any, argProp: any) {
     if (!(docProp instanceof Date) && !Array.isArray(docProp) && docProp != null && typeof docProp == 'object') {
         if (typeof argProp != 'object') {
             return false
@@ -110,10 +104,6 @@ function performValidConditionToDocument<M extends Types.DocumentDefaultArgs>(
             }
         }
         return true
-    }
-
-    if (typeof argProp != 'object') {
-        return false
     }
 
     for (const prop in argProp) {

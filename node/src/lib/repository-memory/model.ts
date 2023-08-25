@@ -55,7 +55,13 @@ export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
             args = {}
         }
 
-        if (!args.orderBy || !Object.keys(args.orderBy).length) {
+        if (!args.orderBy) {
+            // @ts-expect-error
+            args.orderBy = [{ id: 'DESC' }]
+        } else if (Array.isArray(args.orderBy)) {
+            // @ts-expect-error
+            args.orderBy.push({ id: 'DESC' })
+        } else if (!Object.keys(args.orderBy).length) {
             // @ts-expect-error
             args.orderBy = [{ id: 'DESC' }]
         }
