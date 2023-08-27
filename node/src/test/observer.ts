@@ -34,8 +34,8 @@ observer.emitToEvent('start', { hello: 'World' })
 
 observer.on('start', data => console.log(data))
 
-observer.ObserverCore.emitToEvent('start', { hello: 'World!' })
+observer.observerCore.emitToEvent('start', { hello: 'World!' })
 
-new ObserverEvent('Teste2').ObserverCore.emitToContextAndEvent('Teste2', 'start', { hello: 'World!!' })
+new ObserverEvent('Teste2').observerCore.emitToContextAndEvent('Teste2', 'start', { hello: 'World!!' })
 
-console.log(observer.ObserverCore.listeners)
+console.log(observer.observerCore.listeners)
