@@ -1,83 +1,51 @@
-import { ObserverCore } from './core'
+import { Event, EventModel, ActionModel } from './event'
 
-export class ObserverEvent<Context extends string, EventsName extends object = {}> {
-    public static observerCore = new ObserverCore()
-    private context: string
+export type EventsObserver = { [x: string]: any }
 
-    constructor(context: Context) {
-        this.context = context
+export type EventCreateArgs = Omit<EventModel, 'code'>
+export type EventPerformActionEventArgs = EventModel['eventName']
+export type EventAction<Data> = ActionModel<Data>
+
+export class Observer {
+    private static events: Event[] = []
+    private static lastCode = 0
+
+    // # Use Case
+    addEvent({ action, eventName, order }: EventCreateArgs) {
+        const event = this.createEvent({ action, eventName, order })
+
+        this.events.push(event)
     }
 
-    public on<Event extends keyof EventsName>(eventName: Event, handler: (data: EventsName[Event]) => void) {
-        return ObserverEvent.observerCore.onWithContext(eventName, handler, this.context)
+    performActionEvent(eventName: EventModel) {
+
     }
 
-    public onMain<Event extends keyof EventsName>(eventName: Event, handler: (data: EventsName[Event]) => void) {
-        return ObserverEvent.observerCore.onMainWithContext(eventName, handler, this.context)
+    // # Operacional
+    // ## Create
+    private createEvent({ action, eventName, order }: EventCreateArgs) {
+        const code = this.updateAndGetNewCode()
+
+        const event = new Event({ action, eventName, order, code })
+
+        return event
     }
 
-    public async emitToEvent<Event extends keyof EventsName>(eventName: Event, data: EventsName[Event]) {
-        await ObserverEvent.observerCore.emitToContextAndEvent(this.context, eventName, data)
+    private updateAndGetNewCode() {
+        this.lastCode++
+        return this.lastCode
     }
 
-    public async emitToCode<Event extends keyof EventsName>(code: number, data: EventsName[Event]) {
-        await ObserverEvent.observerCore.emitToContextAndCode(this.context, code, data)
+    // # Attributes
+    private get events() {
+        return Observer.events
     }
 
-    public removeListenerByCode(code: number) {
-        ObserverEvent.observerCore.removeListenerByContextAndCode(this.context, code)
+    private get lastCode() {
+        return Observer.lastCode
     }
 
-    public removeListenersByEvent<Event extends keyof EventsName>(eventName: Event) {
-        ObserverEvent.observerCore.removeListenersByContextAndEvent(this.context, eventName)
-    }
-
-    public removeListenerMainByCode(code: number) {
-        ObserverEvent.observerCore.removeListenerMainByContextAndCode(this.context, code)
-    }
-
-    public removeListenersMainByEvent<Event extends keyof EventsName>(eventName: Event) {
-        ObserverEvent.observerCore.removeListenersMainByContextAndEvent(this.context, eventName)
-    }
-
-    // Query
-    public getListenersByEvent<Event extends keyof EventsName>(eventName: Event) {
-        return ObserverEvent.observerCore.getListenersByContextAndEvent(this.context, eventName)
-    }
-
-    public getListeners() {
-        return ObserverEvent.observerCore.getListenersByContext(this.context)
-    }
-
-    public getListenerByCode(codeEvent: number) {
-        return ObserverEvent.observerCore.getListenerByContextAndCode(this.context, codeEvent)
-    }
-
-    public getIndexListenerByCode(codeEvent: number) {
-        return ObserverEvent.observerCore.getIndexListenerByContextAndCode(this.context, codeEvent)
-    }
-
-    public getListenersMainByEvent<Event extends keyof EventsName>(eventName: Event) {
-        return ObserverEvent.observerCore.getListenersMainByContextAndEvent(this.context, eventName)
-    }
-
-    public getListenerMainByCode(codeEvent: number) {
-        return ObserverEvent.observerCore.getListenerMainByContextAndCode(this.context, codeEvent)
-    }
-
-    public getIndexListenerMainByCode(codeEvent: number) {
-        return ObserverEvent.observerCore.getIndexListenerMainByCode(codeEvent)
-    }
-
-    get observerCore() {
-        return ObserverEvent.observerCore
-    }
-
-    public getContext() {
-        return this.context
-    }
-
-    public setContext(value: string) {
-        this.context = value
+    private set lastCode(newCode: number) {
+        Observer.lastCode = newCode
     }
 }
