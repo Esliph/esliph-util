@@ -1,4 +1,6 @@
+import { randomIdIntWithDate } from '../random'
 import { Event, EventModel, ActionModel } from './event'
+import { ObserverEventRepository } from './observer.repository'
 
 export type EventsObserver = { [x: string]: any }
 
@@ -7,45 +9,46 @@ export type EventPerformActionEventArgs = EventModel['eventName']
 export type EventAction<Data> = ActionModel<Data>
 
 export class Observer {
-    private static events: Event[] = []
-    private static lastCode = 0
+    private static repository: ObserverEventRepository = new ObserverEventRepository({ isolated: true })
 
     // # Use Case
-    addEvent({ action, eventName, order }: EventCreateArgs) {
-        const event = this.createEvent({ action, eventName, order })
-
-        this.events.push(event)
+    on(args: EventCreateArgs) {
+        this.performCreateEvent(args)
     }
 
-    performActionEvent(eventName: EventModel) {
-
+    emit(eventName: EventModel['eventName'], data: any) {
+        this.performEmitEventByName(eventName, data)
     }
 
     // # Operacional
     // ## Create
+    private performCreateEvent({ action, eventName, order }: EventCreateArgs) {
+        const event = this.createEvent({ action, eventName, order })
+
+        this.insertInRepository(event)
+    }
+
     private createEvent({ action, eventName, order }: EventCreateArgs) {
-        const code = this.updateAndGetNewCode()
+        const code = randomIdIntWithDate()
 
         const event = new Event({ action, eventName, order, code })
 
         return event
     }
 
-    private updateAndGetNewCode() {
-        this.lastCode++
-        return this.lastCode
+    private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
+        const events = this.repository.findEventsByEventName(eventName)
+
+        console.log(events)
+    }
+
+    // Repository
+    private insertInRepository(event: Event) {
+        this.repository.create({ data: event })
     }
 
     // # Attributes
-    private get events() {
-        return Observer.events
-    }
-
-    private get lastCode() {
-        return Observer.lastCode
-    }
-
-    private set lastCode(newCode: number) {
-        Observer.lastCode = newCode
+    private get repository() {
+        return Observer.repository
     }
 }

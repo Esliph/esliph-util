@@ -8,6 +8,10 @@ export class ObserverEvent<Events extends EventsObserver = any> {
     }
 
     on<EventName extends keyof Events>(eventName: EventName, action: EventAction<Events[EventName]>, order?: EventCreateArgs['order']) {
-        this.observer.addEvent({ action, eventName, order } as EventCreateArgs)
+        this.observer.on({ action, eventName, order } as EventCreateArgs)
+    }
+
+    emit<EventName extends keyof Events>(eventName: EventName, data: Events[EventName]) {
+        this.observer.emit(eventName as string, data)
     }
 }
