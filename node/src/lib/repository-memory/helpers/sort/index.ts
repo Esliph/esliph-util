@@ -30,6 +30,14 @@ function sortData(doc1: any, doc2: any, arg: any, prop: string): number {
 }
 
 function sortPropData(val1: any, val2: any) {
+    if (typeof val1 == 'undefined') {
+        return 1
+    }
+
+    if (typeof val2 == 'undefined') {
+        return -1
+    }
+
     if (typeof val1 == 'number') {
         return val1 - val2
     }
