@@ -1,11 +1,18 @@
 import { Repository } from './repository'
 import { Types } from './helpers'
 
-export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
-    protected readonly repository: Repository
+export type ModelSchemaOptions = {
+    isolated?: boolean
+}
 
-    constructor(public readonly name: string) {
-        this.repository = new Repository()
+export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
+    protected static readonly repository = new Repository()
+    protected readonly repositoryIsolated?: Repository
+
+    constructor(public readonly name: string, public options?: ModelSchemaOptions) {
+        if (options?.isolated) {
+            this.repositoryIsolated = new Repository()
+        }
 
         this.setup()
     }
@@ -74,5 +81,10 @@ export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
 
     findManyIndex(args: Types.FindManyIndexArgs<Types.Document<ModelType>>) {
         return this.repository.findManyIndex<ModelType>(this.name, args)
+    }
+
+    protected get repository() {
+        if (this.options?.isolated) { return this.repositoryIsolated as Repository }
+        return ModelSchema.repository
     }
 }

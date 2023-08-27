@@ -17,7 +17,11 @@ import {
 import { deepClone, deepMerge } from './util'
 
 export class Repository {
-    private static models: Types.ModelsRepository = {}
+    private models: Types.ModelsRepository
+
+    constructor() {
+        this.models = {}
+    }
 
     // # Use Cases
     @Repository.ValidModelName()
@@ -187,10 +191,6 @@ export class Repository {
             descriptor.value = function (...args: any[]) {
                 const modelName = args[orderParam] || {}
 
-                if (!Repository.modelExists(modelName)) {
-                    throw new Error(`Model name${modelName ? ` "${modelName}"` : ''} not define`)
-                }
-
                 const result = originalMethod.apply(this, args)
 
                 return result
@@ -281,14 +281,6 @@ export class Repository {
     }
 
     modelExists(name: string) {
-        return Repository.modelExists(name)
-    }
-
-    static modelExists(name: string) {
         return !!this.models[name]
-    }
-
-    private get models() {
-        return Repository.models
     }
 }
