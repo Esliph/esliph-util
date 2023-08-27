@@ -7,6 +7,10 @@ export function deepClone<T = any>(obj: T, hash = new WeakMap()): T {
         return new Date(obj) as T
     }
 
+    if (isClass(obj)) {
+        return obj
+    }
+
     if (hash.has(obj as any)) {
         return hash.get(obj as any)
     }
@@ -29,4 +33,8 @@ export function deepClone<T = any>(obj: T, hash = new WeakMap()): T {
     }
 
     return clone
+}
+
+function isClass(object: any) {
+    return Object.getPrototypeOf(object) !== Object.prototype
 }

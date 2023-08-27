@@ -1,7 +1,7 @@
 import { ModelSchema, ModelSchemaOptions } from '../repository-memory'
-import { EventModel } from './event'
+import { Event, EventModel } from './event'
 
-export class ObserverEventRepository extends ModelSchema<EventModel> {
+export class ObserverEventRepository extends ModelSchema<Event> {
     constructor(options?: ModelSchemaOptions) {
         super('_ObserverEvents', options)
     }

@@ -25,7 +25,7 @@ export class Observer {
     private performCreateEvent({ action, eventName, order }: EventCreateArgs) {
         const event = this.createEvent({ action, eventName, order })
 
-        this.insertInRepository(event)
+        this.insertInRepository({ ...event, performAction: event.performAction })
     }
 
     private createEvent({ action, eventName, order }: EventCreateArgs) {
@@ -39,7 +39,7 @@ export class Observer {
     private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
         const events = this.repository.findEventsByEventName(eventName)
 
-        console.log(events)
+        events.map(event => event.performAction(data))
     }
 
     // Repository
