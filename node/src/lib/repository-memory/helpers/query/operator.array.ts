@@ -16,7 +16,7 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
-    private static hasSome(value, valueOperator) {
+    private static hasSome(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
                 return true
@@ -28,7 +28,7 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
-    private static hasEvery(value, valueOperator) {
+    private static hasEvery(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (!OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
                 return false
@@ -40,7 +40,7 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
-    private static hasNotEvery(value, valueOperator) {
+    private static hasNotEvery(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
                 return false
@@ -52,7 +52,7 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 1 })
-    private static hasNotSome(value, valueOperator) {
+    private static hasNotSome(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (!OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
                 return true
@@ -64,13 +64,13 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { notArr: true, index: 1 })
-    private static has(value, valueOperator) {
+    private static has(value: any, valueOperator: any) {
         return OperatorArrayFunctions.validValudInArray(valueOperator, value)
     }
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ notArr: true, index: 1 })
-    private static hasNot(value, valueOperator) {
+    private static hasNot(value: any, valueOperator: any) {
         if (!valueOperator) {
             return false
         }
@@ -79,18 +79,18 @@ export class OperatorArrayFunctions {
     }
 
     @OperatorArrayFunctions.TransformValueParams()
-    private static count(value, valueOperator) {
+    private static count(value: any, valueOperator: any) {
         return value.length == valueOperator
     }
 
     @OperatorArrayFunctions.TransformValueParams()
-    private static isEmpty(value, valueOperator) {
+    private static isEmpty(value: any, valueOperator: any) {
         return valueOperator ? !value.length : !!value.length
     }
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
-    private static startsWith(value, valueOperator) {
+    private static startsWith(value: any, valueOperator: any) {
         if (value.length < valueOperator.length) {
             return false
         }
@@ -109,7 +109,7 @@ export class OperatorArrayFunctions {
 
     @OperatorArrayFunctions.TransformValueParams()
     @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
-    private static endsWith(value, valueOperator) {
+    private static endsWith(value: any, valueOperator: any) {
         if (value.length < valueOperator.length) {
             return false
         }
@@ -128,7 +128,7 @@ export class OperatorArrayFunctions {
         return true
     }
 
-    private static validValudInArray(value, arr) {
+    private static validValudInArray(value: any, arr: any[]) {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] == value) {
                 return true
@@ -138,7 +138,7 @@ export class OperatorArrayFunctions {
     }
 
     private static ValidParams(...params: { notArr?: boolean; index: number }[]) {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
@@ -164,7 +164,7 @@ export class OperatorArrayFunctions {
     }
 
     private static TransformValueParams() {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
