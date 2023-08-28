@@ -17,31 +17,31 @@ export class OperatorNumberFunctions {
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static contains(value, valueOperator) {
+    private static contains(value: any, valueOperator: any) {
         return value.includes(valueOperator)
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static biggerOrEqualsThat(value, valueOperator) {
+    private static biggerOrEqualsThat(value: any, valueOperator: any) {
         return value >= valueOperator
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static lessOrEqualsThat(value, valueOperator) {
+    private static lessOrEqualsThat(value: any, valueOperator: any) {
         return value <= valueOperator
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static biggerThat(value, valueOperator) {
+    private static biggerThat(value: any, valueOperator: any) {
         return value > valueOperator
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static lessThat(value, valueOperator) {
+    private static lessThat(value: any, valueOperator: any) {
         return value < valueOperator
     }
 
-    private static between(value, valueOperator) {
+    private static between(value: any, valueOperator: any) {
         if (valueOperator.biggerOrEqualsThat) {
             if (!OperatorNumberFunctions.biggerOrEqualsThat(value, valueOperator.biggerOrEqualsThat)) {
                 return false
@@ -56,31 +56,31 @@ export class OperatorNumberFunctions {
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static notContains(value, valueOperator) {
+    private static notContains(value: any, valueOperator: any) {
         return !value.includes(valueOperator)
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static equals(value, valueOperator) {
+    private static equals(value: any, valueOperator: any) {
         return value == valueOperator
     }
 
     @OperatorNumberFunctions.TransformValueParams()
-    private static different(value, valueOperator) {
+    private static different(value: any, valueOperator: any) {
         return value != valueOperator
     }
 
     @OperatorNumberFunctions.TransformValueParams({ toString: true })
-    private static startsWith(value, valueOperator) {
+    private static startsWith(value: any, valueOperator: any) {
         return `${value}`.startsWith(`${valueOperator}`)
     }
 
     @OperatorNumberFunctions.TransformValueParams({ toString: true })
-    private static endsWith(value, valueOperator) {
+    private static endsWith(value: any, valueOperator: any) {
         return `${value}`.endsWith(`${valueOperator}`)
     }
 
-    private static filled(value, valueOperator) {
+    private static filled(value: any, valueOperator: any) {
         if (valueOperator) {
             return !!`${value}`
         }
@@ -88,7 +88,7 @@ export class OperatorNumberFunctions {
     }
 
     private static TransformValueParams(config?: { toString?: boolean }) {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
