@@ -8,17 +8,17 @@ export class OperatorBooleanFunctions {
     }
 
     @OperatorBooleanFunctions.TransformValueParams()
-    private static equals(value, valueOperator) {
+    private static equals(value: any, valueOperator: any) {
         return value == valueOperator
     }
 
     @OperatorBooleanFunctions.TransformValueParams()
-    private static different(value, valueOperator) {
+    private static different(value: any, valueOperator: any) {
         return value != valueOperator
     }
 
     @OperatorBooleanFunctions.TransformValueParams()
-    private static filled(value, valueOperator) {
+    private static filled(value: any, valueOperator: any) {
         if (valueOperator) {
             return !!value
         }
@@ -26,7 +26,7 @@ export class OperatorBooleanFunctions {
     }
 
     private static TransformValueParams() {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
