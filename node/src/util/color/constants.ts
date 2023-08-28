@@ -1,0 +1,73 @@
+export const EnumColorsText = {
+    default: '39',
+    blackDark: '30;2',
+    black: '30',
+    blackLight: '90',
+    redDark: '31;2',
+    red: '31',
+    redLight: '91',
+    greenDark: '32;2',
+    green: '32',
+    greenLight: '92',
+    yellowDark: '33;2',
+    yellow: '33',
+    yellowLight: '93;1',
+    blueDark: '34;2',
+    blue: '34',
+    blueLight: '94',
+    magentaDark: '35;2',
+    magenta: '35',
+    magentaLight: '95',
+    cyanDark: '36;2',
+    cyan: '36',
+    cyanLight: '96',
+    white: '37',
+    greyDark: '1;2',
+    grey: '1',
+    greyLight: '1',
+} as const
+
+export const EnumColorsBackground = {
+    default: '49',
+    blackDark: '40;2',
+    black: '40',
+    blackLight: '40',
+    redDark: '41;2',
+    red: '41',
+    redLight: '101',
+    greenDark: '42;2',
+    green: '42',
+    greenLight: '102',
+    yellowDark: '43;2',
+    yellow: '43',
+    yellowLight: '103',
+    blueDark: '44;2',
+    blue: '44',
+    blueLight: '104',
+    magentaDark: '45;2',
+    magenta: '45',
+    magentaLight: '105',
+    cyanDark: '46;2',
+    cyan: '46',
+    cyanLight: '106',
+    whiteDark: '47;2',
+    white: '47',
+    whiteLight: '107',
+    greyDark: '47;2',
+    grey: '47',
+    greyLight: '47',
+} as const
+
+export const EnumColorsStyles = {
+    default: '39',
+    bold: '1',
+    italic: '3',
+    underline: '4',
+    doubleUnderline: '21',
+    strikethrough: '9',
+} as const
+
+export const SCAPE_SEQUENCE = '\x1b'
+export const SUFFIX_CODE = 'm'
+export const PREFIX_CODE = `${SCAPE_SEQUENCE}[`
+export const RESET_TEXT_STYLE = '0'
