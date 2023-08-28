@@ -12,37 +12,37 @@ export class OperatorStringFunctions {
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static contains(value, valueOperator) {
+    private static contains(value: any, valueOperator: any) {
         return value.includes(valueOperator)
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static notContains(value, valueOperator) {
+    private static notContains(value: any, valueOperator: any) {
         return !value.includes(valueOperator)
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static equals(value, valueOperator) {
+    private static equals(value: any, valueOperator: any) {
         return value == valueOperator
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static different(value, valueOperator) {
+    private static different(value: any, valueOperator: any) {
         return value != valueOperator
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static startsWith(value, valueOperator) {
+    private static startsWith(value: any, valueOperator: any) {
         return value.startsWith(valueOperator)
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static endsWith(value, valueOperator) {
+    private static endsWith(value: any, valueOperator: any) {
         return value.endsWith(valueOperator)
     }
 
     @OperatorStringFunctions.TransformValueParams()
-    private static filled(value, valueOperator) {
+    private static filled(value: any, valueOperator: any) {
         if (valueOperator) {
             return !!value
         }
@@ -50,7 +50,7 @@ export class OperatorStringFunctions {
     }
 
     private static TransformValueParams() {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
