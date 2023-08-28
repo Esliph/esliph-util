@@ -13,26 +13,26 @@ export class OperatorDateFunctions {
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static biggerOrEqualsThat(value, valueOperator) {
+    private static biggerOrEqualsThat(value: any, valueOperator: any) {
         return value.getTime() >= valueOperator.getTime()
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static lessOrEqualsThat(value, valueOperator) {
+    private static lessOrEqualsThat(value: any, valueOperator: any) {
         return value.getTime() <= valueOperator.getTime()
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static biggerThat(value, valueOperator) {
+    private static biggerThat(value: any, valueOperator: any) {
         return value.getTime() > valueOperator.getTime()
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static lessThat(value, valueOperator) {
+    private static lessThat(value: any, valueOperator: any) {
         return value.getTime() < valueOperator.getTime()
     }
 
-    private static between(value, valueOperator) {
+    private static between(value: any, valueOperator: any) {
         if (valueOperator.biggerOrEqualsThat) {
             if (!OperatorDateFunctions.biggerOrEqualsThat(value, valueOperator.biggerOrEqualsThat)) {
                 return false
@@ -47,16 +47,16 @@ export class OperatorDateFunctions {
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static equals(value, valueOperator) {
+    private static equals(value: any, valueOperator: any) {
         return value.getTime() == valueOperator.getTime()
     }
 
     @OperatorDateFunctions.TransformValueParams()
-    private static different(value, valueOperator) {
+    private static different(value: any, valueOperator: any) {
         return value.getTime() != valueOperator.getTime()
     }
 
-    private static filled(value, valueOperator) {
+    private static filled(value: any, valueOperator: any) {
         if (valueOperator) {
             return !!value
         }
@@ -64,7 +64,7 @@ export class OperatorDateFunctions {
     }
 
     private static TransformValueParams(config?: {}) {
-        return function (target, property, descriptor) {
+        return function (target: any, key: string, descriptor: PropertyDescriptor) {
             const originalMethod = descriptor.value
 
             descriptor.value = function (...args: any[]) {
