@@ -38,7 +38,7 @@ export type GetOperatorsByRelationType<Type extends OperatorsPropsType | 'Defaul
 export type OrderByType = keyof typeof OrderBy
 
 export type DocumentDefaultArgs = object
-export type Document<ModelType extends DocumentDefaultArgs = {}> = ModelType & { id: number; createAt: Date; updateAt: Date }
+export type Document<ModelType extends DocumentDefaultArgs = {}> = ModelType & { readonly id: number; readonly createAt: Date; updateAt: Date }
 export type ModelRepository = { documents: Document[]; lastId: number }
 export type ModelsRepository = { [x: string]: ModelRepository }
 export type ModelArgs<M extends DocumentDefaultArgs> = Document<M>
@@ -52,12 +52,12 @@ export type SelectArgs<M extends Document> = PartialDeep<ExtractPropsInPayload<M
 
 export type FindDefaultModelArgs<M extends object> = {
     [x in keyof M]: M[x] extends Array<any>
-        ? Partial<GetTypeOperatorByType<M[x]>>
-        : M[x] extends Date
-        ? Partial<GetTypeOperatorByType<M[x]>>
-        : M[x] extends object
-        ? FindDefaultModelArgs<M[x]>
-        : Partial<GetTypeOperatorByType<M[x]>>
+    ? Partial<GetTypeOperatorByType<M[x]>>
+    : M[x] extends Date
+    ? Partial<GetTypeOperatorByType<M[x]>>
+    : M[x] extends object
+    ? FindDefaultModelArgs<M[x]>
+    : Partial<GetTypeOperatorByType<M[x]>>
 }
 export type FindOperatorsArgs<M extends Document> = FindDefaultArgs<M>[]
 export type FindDefaultArgs<M extends Document> = PartialDeep<FindDefaultModelArgs<M>> & { [x in OperatorsType]?: FindOperatorsArgs<M> }

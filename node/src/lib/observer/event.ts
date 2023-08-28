@@ -1,23 +1,20 @@
 export type ActionModel<Args = any> = (data: Args) => void | Promise<void>
 
 export type EventModel = {
-    code: number
-    eventName: string
-    action: ActionModel
-    order?: number
+    readonly code: number
+    readonly eventName: string
+    readonly action: ActionModel
 }
 
 export class Event implements EventModel {
-    public code: number
-    public action: ActionModel
-    public eventName: string
-    public order?: number
+    public readonly code: number
+    public readonly action: ActionModel
+    public readonly eventName: string
 
-    constructor({ action, code, eventName, order }: EventModel) {
+    constructor({ action, code, eventName }: EventModel) {
         this.code = code
         this.action = action
         this.eventName = eventName
-        this.order = order
     }
 
     async performAction(data: any) {

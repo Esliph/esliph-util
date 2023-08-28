@@ -7,16 +7,19 @@ type EventsExemplo = {
 
 const observerEvent = new ObserverEvent<EventsExemplo>()
 
-observerEvent.on('message', ({ message }) => {
-    console.log({ message }, 3)
+const evt1 = observerEvent.on('message', ({ message }) => {
+    console.log({ message })
 })
 
 observerEvent.on('message', ({ message }) => {
-    console.log({ message }, 1)
-}, 1)
+    console.log({ message })
+})
 
-observerEvent.on('message', ({ message }) => {
-    console.log({ message }, 2)
-}, 3)
+observerEvent.on('response', ({ response }) => {
+    console.log({ response })
+})
+
+observerEvent.removeEvent(evt1)
 
 observerEvent.emit('message', { message: 'hello world' })
+observerEvent.emit('response', { response: 'hello world' })
