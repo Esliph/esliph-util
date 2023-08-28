@@ -47,7 +47,7 @@ export class Observer {
     private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
         const events = this.repository.findEventsByEventName(eventName)
 
-        events.map(event => event.performAction(data))
+        events.map(event => setTimeout(() => event.performAction(data), 1))
     }
 
     // ## Delete
