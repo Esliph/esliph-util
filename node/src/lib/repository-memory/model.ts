@@ -79,12 +79,18 @@ export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
         return this.repository.findIndex<ModelType>(this.name, args)
     }
 
+    isExists(args: Types.IsExistsArgs<Types.Document<ModelType>>) {
+        return this.repository.isExists<ModelType>(this.name, args)
+    }
+
     findManyIndex(args: Types.FindManyIndexArgs<Types.Document<ModelType>>) {
         return this.repository.findManyIndex<ModelType>(this.name, args)
     }
 
     protected get repository() {
-        if (this.options?.isolated) { return this.repositoryIsolated as Repository }
+        if (this.options?.isolated) {
+            return this.repositoryIsolated as Repository
+        }
         return ModelSchema.repository
     }
 }
