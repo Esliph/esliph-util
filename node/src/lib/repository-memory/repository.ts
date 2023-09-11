@@ -7,10 +7,12 @@ import {
     CreateResponse,
     DeleteManyResponse,
     DeleteResponse,
+    FindExistsArgs,
     FindFirstResponse,
     FindIndexResponse,
     FindManyIndexResponse,
     FindManyResponse,
+    IsExistsResponse,
     UpdateManyResponse,
     UpdateResponse,
 } from './helpers/types.model'
@@ -72,6 +74,15 @@ export class Repository {
         }
 
         return this.getDocumentFiltered<M>(name, args.where)
+    }
+
+    @Repository.ValidModelName()
+    isExists<M extends Types.DocumentDefaultArgs>(name: string, args: Types.IsExistsArgs<Types.Document<M>>): IsExistsResponse {
+        if (!Object.keys(args.where).length) {
+            return false
+        }
+
+        return !!this.getDocumentFiltered<M>(name, args.where)
     }
 
     @Repository.LimitDocumentsResult()

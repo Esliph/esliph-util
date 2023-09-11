@@ -52,12 +52,12 @@ export type SelectArgs<M extends Document> = PartialDeep<ExtractPropsInPayload<M
 
 export type FindDefaultModelArgs<M extends object> = {
     [x in keyof M]: M[x] extends Array<any>
-    ? Partial<GetTypeOperatorByType<M[x]>>
-    : M[x] extends Date
-    ? Partial<GetTypeOperatorByType<M[x]>>
-    : M[x] extends object
-    ? FindDefaultModelArgs<M[x]>
-    : Partial<GetTypeOperatorByType<M[x]>>
+        ? Partial<GetTypeOperatorByType<M[x]>>
+        : M[x] extends Date
+        ? Partial<GetTypeOperatorByType<M[x]>>
+        : M[x] extends object
+        ? FindDefaultModelArgs<M[x]>
+        : Partial<GetTypeOperatorByType<M[x]>>
 }
 export type FindOperatorsArgs<M extends Document> = FindDefaultArgs<M>[]
 export type FindDefaultArgs<M extends Document> = PartialDeep<FindDefaultModelArgs<M>> & { [x in OperatorsType]?: FindOperatorsArgs<M> }
@@ -65,6 +65,8 @@ export type FindDefaultResponse<M extends Document, S extends SelectArgs<M>> = M
 export type FindArgs<M extends Document> = { where: FindDefaultArgs<M> }
 export type FindFirstArgs<M extends Document> = FindArgs<M>
 export type FindFirstResponse<M extends DocumentDefaultArgs> = Document<M> | null
+export type IsExistsArgs<M extends Document> = FindArgs<M>
+export type IsExistsResponse = boolean
 export type FindIndexArgs<M extends Document> = FindArgs<M>
 export type FindIndexResponse = number
 export type FindManyIndexArgs<M extends Document> = FindArgs<M> & { limit?: LimitArgs }

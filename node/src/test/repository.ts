@@ -19,17 +19,11 @@ const userRepository = new UserRepository()
 const userRepository2 = new UserRepository({ isolated: true })
 
 userRepository.createMany({
-    data: [
-        { username: 'Aan-ruan', email: 'dan@gmail.com', age: 19, active: false, hobbies: ['Coding'] },
-    ],
+    data: [{ username: 'Aan-ruan', email: 'dan@gmail.com', age: 19, active: false, hobbies: ['Coding'] }],
 })
 
 userRepository2.createMany({
-    data: [
-        { username: 'Aan-ruan', email: 'dan@gmail.com', age: 19, active: false, hobbies: ['Coding'] },
-    ]
+    data: [{ username: 'Aan-ruan', email: 'dan@gmail.com', age: 19, active: false, hobbies: ['Coding'] }],
 })
 
-console.log(
-    userRepository.findMany()
-)
+console.log(userRepository.findMany(), userRepository.isExists({ where: { id: { equals: 2 } } }))
