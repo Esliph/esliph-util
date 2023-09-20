@@ -18,7 +18,7 @@ export class Observer {
     }
 
     emit(eventName: EventModel['eventName'], data: any) {
-        this.performEmitEventByName(eventName, data)
+        this.performEmitEventsByName(eventName, data)
     }
 
     deleteEvent(code: EventDeleteEventArgs) {
@@ -44,10 +44,20 @@ export class Observer {
     }
 
     // ## Emit
-    private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
+    private performEmitEventsByName(eventName: EventModel['eventName'], data: any) {
         const events = this.repository.findEventsByEventName(eventName)
 
         events.map(event => setTimeout(() => event.performAction(data), 1))
+    }
+
+    private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
+        const event = this.repository.findEventByEventName(eventName)
+
+        if (!event) {
+            return null
+        }
+
+        return event.action(data)
     }
 
     // ## Delete
@@ -63,5 +73,9 @@ export class Observer {
     // # Attributes
     private get repository() {
         return Observer.repository
+    }
+
+    getEventByEventName(eventName: string) {
+        return this.repository.findEventByEventName(eventName)
     }
 }
