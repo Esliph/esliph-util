@@ -12,7 +12,7 @@ export type EventPerformActionEventArgs = EventModel['eventName']
 export type EventDeleteEventArgs = EventModel['code']
 
 export class Observer {
-   private  static repository: ObserverEventRepository = new ObserverEventRepository({ isolated: true })
+    private static repository: ObserverEventRepository = new ObserverEventRepository({ isolated: true })
 
     // # Use Case
     on(args: EventCreateArgs) {
@@ -85,9 +85,5 @@ export class Observer {
     // # Attributes
     private get repository() {
         return Observer.repository
-    }
-
-    getEventByEventName(eventName: string) {
-        return this.repository.findEventByEventName(eventName)
     }
 }
