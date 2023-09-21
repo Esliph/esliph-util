@@ -2,9 +2,11 @@ import { randomIdIntWithDate } from '../random'
 import { Event, EventModel, ActionModel } from './event'
 import { ObserverEventRepository } from './observer.repository'
 
-export type EventsObserver = { [x: string]: any }
+export type EventsObserver = {
+    [x: string]: any
+}
 
-export type EventAction<Data> = ActionModel<Data>
+export type EventAction<Data, Res = void> = ActionModel<Data, Res>
 export type EventCreateArgs = Omit<EventModel, 'code'>
 export type EventPerformActionEventArgs = EventModel['eventName']
 export type EventDeleteEventArgs = EventModel['code']
@@ -18,11 +20,15 @@ export class Observer {
     }
 
     emit(eventName: EventModel['eventName'], data: any) {
-        this.performEmitEventByName(eventName, data)
+        this.performEmitEventsByName(eventName, data)
     }
 
     deleteEvent(code: EventDeleteEventArgs) {
         this.performDeleteEvent(code)
+    }
+
+    getEventByEventName(eventName: string) {
+        return this.repository.findEventByEventName(eventName)
     }
 
     // # Operacional
@@ -44,10 +50,26 @@ export class Observer {
     }
 
     // ## Emit
-    private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
+    private performEmitEventsByName(eventName: EventModel['eventName'], data: any) {
         const events = this.repository.findEventsByEventName(eventName)
 
-        events.map(event => setTimeout(() => event.performAction(data), 1))
+        events.map(event => setTimeout(() => this.performEvent(event, data), 1))
+    }
+
+    performEvent(event: Event, data: any) {
+        const response = event.performAction(data)
+
+        return response
+    }
+
+    private performEmitEventByName(eventName: EventModel['eventName'], data: any) {
+        const event = this.repository.findEventByEventName(eventName)
+
+        if (!event) {
+            return null
+        }
+
+        return event.action(data)
     }
 
     // ## Delete

@@ -14,6 +14,16 @@ export class ObserverEventRepository extends ModelSchema<EventModel> {
         return this.findMany({ where: { eventName: { equals: eventName } } }).map(evt => new Event(evt))
     }
 
+    public findEventByEventName(eventName: EventModel['eventName']) {
+        const event = this.findFirst({ where: { eventName: { equals: eventName } } })
+
+        if (!event) {
+            return null
+        }
+
+        return new Event(event)
+    }
+
     public findEventsByCode(code: EventModel['code']) {
         return this.findMany({ where: { code: { equals: code } } }).map(evt => new Event(evt))
     }
