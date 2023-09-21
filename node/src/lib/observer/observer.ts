@@ -19,8 +19,8 @@ export class Observer {
         return this.performCreateEvent(args)
     }
 
-    emit(eventName: EventModel['eventName'], data: any) {
-        this.performEmitEventsByName(eventName, data)
+    emit(eventName: EventModel['eventName'], data: any, req?: any) {
+        this.performEmitEventsByName(eventName, data, req)
     }
 
     deleteEvent(code: EventDeleteEventArgs) {
@@ -50,14 +50,14 @@ export class Observer {
     }
 
     // ## Emit
-    private performEmitEventsByName(eventName: EventModel['eventName'], data: any) {
+    private performEmitEventsByName(eventName: EventModel['eventName'], data: any, req?: any) {
         const events = this.repository.findEventsByEventName(eventName)
 
-        events.map(event => setTimeout(() => this.performEvent(event, data), 1))
+        events.map(event => setTimeout(() => this.performEvent(event, data, req), 1))
     }
 
-    performEvent(event: Event, data: any) {
-        const response = event.performAction(data)
+    performEvent(event: Event, data: any, req: any = {}) {
+        const response = event.performAction(data, req)
 
         return response
     }
