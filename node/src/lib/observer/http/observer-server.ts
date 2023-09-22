@@ -8,35 +8,35 @@ export class ObserverServer {
         this.observer = new Observer()
     }
 
-    get(eventName: string, action: EventAction<any, any>) {
+    get(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.GET}:${eventName}`, action)
     }
 
-    post(eventName: string, action: EventAction<any, any>) {
+    post(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.POST}:${eventName}`, action)
     }
 
-    put(eventName: string, action: EventAction<any, any>) {
+    put(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.PUT}:${eventName}`, action)
     }
 
-    patch(eventName: string, action: EventAction<any, any>) {
+    patch(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.PATCH}:${eventName}`, action)
     }
 
-    delete(eventName: string, action: EventAction<any, any>) {
+    delete(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.DELETE}:${eventName}`, action)
     }
 
-    head(eventName: string, action: EventAction<any, any>) {
+    head(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.HEAD}:${eventName}`, action)
     }
 
-    options(eventName: string, action: EventAction<any, any>) {
+    options(eventName: string, action: EventAction) {
         return this.createEvent(`${HttpMethods.OPTIONS}:${eventName}`, action)
     }
 
-    private createEvent(eventName: string, action: EventAction<any, any>) {
+    private createEvent(eventName: string, action: EventAction) {
         return this.observer.on({ eventName, action })
     }
 }

@@ -1,4 +1,4 @@
-export type ActionModel<Data = any, Req = any, Res = void> = (data: Data, options?: Req) => Res | Promise<Res>
+export type ActionModel<Data = any, Req = any, Res = any | void> = (data: Data, options?: Req) => Res | Promise<Res>
 
 export type EventModel = {
     readonly code: number

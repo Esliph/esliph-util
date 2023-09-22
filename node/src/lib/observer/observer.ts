@@ -6,7 +6,7 @@ export type EventsObserver = {
     [x: string]: any
 }
 
-export type EventAction<Data, Res = void> = ActionModel<Data, Res>
+export type EventAction = ActionModel
 export type EventCreateArgs = Omit<EventModel, 'code'>
 export type EventPerformActionEventArgs = EventModel['eventName']
 export type EventDeleteEventArgs = EventModel['code']
