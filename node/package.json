@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util-node",
-    "version": "1.0.41",
+    "version": "1.0.44",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
@@ -10,6 +10,7 @@
         "start": "node dist/index.js",
         "dev:console": "tsx watch src/test/console.ts",
         "dev:observer": "tsx watch src/test/observer.ts",
+        "dev:observer:http": "tsx watch src/test/observer.http.ts",
         "dev:exception": "tsx watch src/test/exception.ts",
         "dev:repository": "tsx watch src/test/repository.ts",
         "setup:dev:observer": "rm -r dist && npm run build && node dist/test/observer.js",

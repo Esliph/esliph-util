@@ -1,6 +1,6 @@
 import { EnumColorsBackground, EnumColorsStyles, EnumColorsText, PREFIX_CODE, RESET_TEXT_STYLE, SCAPE_SEQUENCE, SUFFIX_CODE } from './constants'
 
-export type { EnumColorsBackground, EnumColorsStyles, EnumColorsText }
+export { EnumColorsBackground, EnumColorsStyles, EnumColorsText }
 
 export type ColorizeArgs = { color?: ColorsTextEnable; background?: ColorsBackgroundEnable; styles?: ColorsTextStylesEnable | ColorsTextStylesEnable[] }
 export type ColorsTextEnable = keyof typeof EnumColorsText

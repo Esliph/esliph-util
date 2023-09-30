@@ -1,4 +1,4 @@
-export type ActionModel<Args = any> = (data: Args) => void | Promise<void>
+export type ActionModel<Data = any, Req = any, Res = any | void> = (data: Data, options?: Req) => Res | Promise<Res>
 
 export type EventModel = {
     readonly code: number
@@ -17,9 +17,9 @@ export class Event implements EventModel {
         this.eventName = eventName
     }
 
-    async performAction(data: any) {
-        const response = await this.action(data)
+    async performAction<Req = any, Res = any>(data: any, req: Req): Promise<Res> {
+        const response = await this.action(data, req)
 
-        return response
+        return response as any
     }
 }
