@@ -4,7 +4,7 @@ import { HttpMethods } from './constants'
 export class ObserverServer {
     protected observer: Observer
 
-    constructor() {
+    constructor(private prefix = '') {
         this.observer = new Observer()
     }
 
@@ -37,6 +37,6 @@ export class ObserverServer {
     }
 
     private createEvent(eventName: string, action: EventAction) {
-        return this.observer.on({ eventName, action })
+        return this.observer.on({ eventName: `${this.prefix}${eventName}`, action })
     }
 }

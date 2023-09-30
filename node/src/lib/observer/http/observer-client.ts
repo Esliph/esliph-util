@@ -1,12 +1,14 @@
 import { Observer } from '../observer'
 import { HttpMethods } from './constants'
 
-export type OptionsClient = {}
+export type OptionsClient = {
+    prefix: string
+}
 
 export class ObserverClient {
     protected observer: Observer
 
-    constructor(private optionsClient: OptionsClient = {}) {
+    constructor(private optionsClient: OptionsClient = { prefix: '' }) {
         this.observer = new Observer()
     }
 
@@ -60,7 +62,7 @@ export class ObserverClient {
     }
 
     private async performEvent(method: HttpMethods, eventName: string, data?: any, options?: OptionsClient) {
-        const event = this.observer.getEventByEventName(`${method}:${eventName}`)
+        const event = this.observer.getEventByEventName(`${options?.prefix}${method}:${eventName}`)
 
         if (!event) {
             throw new Error(`Method ${method} "${eventName}" not found`)
