@@ -7,7 +7,7 @@ export class ObserverEvent<Events extends EventsObserver = any> {
         this.observer = new Observer()
     }
 
-    on<EventName extends keyof Events>(eventName: EventName, action: EventAction<Events[EventName]>) {
+    on<EventName extends keyof Events>(eventName: EventName, action: EventAction) {
         return this.observer.on({ action, eventName } as EventCreateArgs)
     }
 

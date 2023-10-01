@@ -1,3 +1,4 @@
+import { ErrorResult } from '../../error'
 import { Observer } from '../observer'
 import { HttpMethods } from './constants'
 
@@ -10,46 +11,46 @@ export class ObserverClient {
         this.observer = new Observer()
     }
 
-    async get(eventName: string, data?: any, options?: OptionsClient) {
+    async get<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.GET, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async post(eventName: string, data?: any, options?: OptionsClient) {
+    async post<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.POST, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async put(eventName: string, data?: any, options?: OptionsClient) {
+    async put<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.PUT, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async patch(eventName: string, data?: any, options?: OptionsClient) {
+    async patch<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.PATCH, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async delete(eventName: string, data?: any, options?: OptionsClient) {
+    async delete<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.DELETE, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async head(eventName: string, data?: any, options?: OptionsClient) {
+    async head<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.HEAD, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
-    async options(eventName: string, data?: any, options?: OptionsClient) {
+    async options<T = any>(eventName: string, data?: any, options?: OptionsClient) {
         const response = await this.performEvent(HttpMethods.OPTIONS, `${eventName}`, data, options)
 
-        return response
+        return response as T
     }
 
     private getFullOptionsClients(options: Partial<OptionsClient> = {}) {
@@ -63,7 +64,7 @@ export class ObserverClient {
         const event = this.observer.getEventByEventName(`${method}:${this.prefix}${eventName}`)
 
         if (!event) {
-            throw new Error(`Method ${method} "${this.prefix}${eventName}" not found`)
+            throw new ErrorResult({ title: '', message: `Method ${method} "${this.prefix}${eventName}" not found` })
         }
 
         const fullOptions = this.getFullOptionsClients(options)
