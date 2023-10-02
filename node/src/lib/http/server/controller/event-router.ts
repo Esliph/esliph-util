@@ -1,10 +1,11 @@
+import { Result } from '../../../result'
 import { HttpStatusCodes } from '../../utils/status-code'
 import { Request } from '../handler/request'
 import { Response } from '../handler/response'
 import { HandlerRouter } from '../model'
 
 export class EventRouter<Body = any, Res = any> {
-    constructor(private request: Request<Body>, private handlers: HandlerRouter<Body>[], private isExists = true) {}
+    constructor(private request: Request<Body>, private handlers: HandlerRouter<Body>[], private isExists = true) { }
 
     async perform() {
         const response = new Response<Res>()
@@ -20,7 +21,15 @@ export class EventRouter<Body = any, Res = any> {
         for (let i = 0; i < this.handlers.length; i++) {
             const handler = this.handlers[i]
 
-            await handler(this.request, response)
+            try {
+                await handler(this.request, response)
+            } catch (err: any) {
+                if (err instanceof Result) {
+                    return response.status(err.getStatus() >= 400 ? err.getStatus() : HttpStatusCodes.BAD_GATEWAY).error(err.getError())
+                }
+
+                return response.status(HttpStatusCodes.BAD_GATEWAY).error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
+            }
 
             if (!response.getResponse().isSuccess()) {
                 return response.getResponse()
