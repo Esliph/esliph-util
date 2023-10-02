@@ -40,11 +40,11 @@ export class ObserverController {
         })
     }
 
-    private async performEventAction<Name extends string, Args>(event: Event<Name, Args>, data: any) {
+    protected async performEventAction<Name extends string, Args>(event: Event<Name, Args>, data: any) {
         await event.action(data)
     }
 
-    private get repository() {
+    protected get repository() {
         return ObserverController.repository
     }
 }

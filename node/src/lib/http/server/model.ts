@@ -1,8 +1,7 @@
-import { Next } from './handler/next'
 import { Request } from './handler/request'
 import { Response } from './handler/response'
 
-export enum Methods {
+export enum Method {
     GET = 'GET',
     POST = 'POST',
     PUT = 'PUT',
@@ -12,18 +11,18 @@ export enum Methods {
     OPTIONS = 'OPTIONS',
 }
 
-export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Response, next: Next) => Promise<Res>
+export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Response<Res>) => Promise<void> | void
 
 export type RouterModelArgs = {
     name: string
     context: string
-    method: Methods
+    method: Method
     handlers: HandlerRouter[]
 }
 
 export type RouterModel<Context extends string, Name extends string, Body = any> = {
     name: Name
     context: Context
-    method: Methods
-    handlers: HandlerRouter<Body>[]
+    method: Method
+    handlers: HandlerRouter<Name, Body>[]
 }
