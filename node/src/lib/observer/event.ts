@@ -1,25 +1,13 @@
-export type ActionModel<Data = any, Req = any, Res = any | void> = (data: Data, options?: Req) => Res | Promise<Res>
+import { Action, EventModel } from './model'
 
-export type EventModel = {
+export class Event<Name extends string, Args = any> implements EventModel<Name, Args> {
     readonly code: number
-    readonly eventName: string
-    readonly action: ActionModel
-}
+    readonly name: Name
+    readonly action: Action<Args>
 
-export class Event implements EventModel {
-    public readonly code: number
-    public readonly action: ActionModel
-    public readonly eventName: string
-
-    constructor({ action, code, eventName }: EventModel) {
-        this.code = code
+    constructor({ action, code, name }: EventModel<Name, Args>) {
         this.action = action
-        this.eventName = eventName
-    }
-
-    async performAction<Req = any, Res = any>(data: any, req: Req): Promise<Res> {
-        const response = await this.action(data, req)
-
-        return response as any
+        this.code = code
+        this.name = name
     }
 }
