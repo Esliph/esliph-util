@@ -26,11 +26,11 @@ export class EventRouter<Body = any, Res = any> {
             } catch (err: any) {
                 if (err instanceof Result) {
                     response.status(err.getStatus()).error(err.getError())
+                } else {
+                    response
+                        .status(HttpStatusCodes.BAD_GATEWAY)
+                        .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
                 }
-
-                response
-                    .status(HttpStatusCodes.BAD_GATEWAY)
-                    .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
             }
 
             if (!response.getResponse().isSuccess()) {
