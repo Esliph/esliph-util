@@ -7,7 +7,6 @@ import {
     CreateResponse,
     DeleteManyResponse,
     DeleteResponse,
-    FindExistsArgs,
     FindFirstResponse,
     FindIndexResponse,
     FindManyIndexResponse,

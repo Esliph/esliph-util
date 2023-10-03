@@ -1,8 +1,12 @@
+import { Method } from '../model'
+
 export type EventsModel = {
     [context: string]: {
-        [router: string]: {
-            body: any
-            response: any
+        [method in keyof typeof Method]?: {
+            [router: string]: {
+                body: any
+                response: any
+            }
         }
     }
 }

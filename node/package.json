@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util-node",
-    "version": "1.0.52",
+    "version": "1.0.55",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
@@ -13,9 +13,9 @@
         "dev:http": "tsx watch src/test/http.ts",
         "dev:exception": "tsx watch src/test/exception.ts",
         "dev:repository": "tsx watch src/test/repository.ts",
-        "setup:dev:observer": "rm -r dist && npm run build && node dist/test/observer.js",
-        "setup:dev:local-storage": "rm -r dist && npm run build && node dist/test/local-storage.js",
-        "build": "npx tsc"
+        "rebuild": "rm -r dist --force && npx tsc",
+        "build": "npx tsc",
+        "publish": "npm publish --access public"
     },
     "repository": {
         "url": "git+https://github.com/Danrley-Ruan-Saquetti/util.git"

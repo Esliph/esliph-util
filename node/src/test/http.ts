@@ -3,22 +3,26 @@ import { Client } from '../lib/http/server/observers/client'
 
 type Events = {
     'PUBLIC': {
-        'hello': {
-            body: { hello: string }
-            response: { world: string }
+        'GET': {
+            'hello': {
+                body: { hello: string }
+                response: { world: string }
+            }
         }
     }
     'PRIVATE': {
-        'world': {
-            body: { world: string }
-            response: { hello: string }
+        'POST': {
+            'world': {
+                body: { world: string }
+                response: { hello: string }
+            }
         }
     }
 }
 
 async function App() {
-    const server = new Server<Events, 'PUBLIC'>({ context: 'PUBLIC' })
-    const client = new Client<Events, 'PUBLIC'>({ context: 'PUBLIC' })
+    const server = new Server<Events, 'PUBLIC'>('PUBLIC')
+    const client = new Client<Events, 'PUBLIC'>('PUBLIC')
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
@@ -30,14 +34,14 @@ async function App() {
 }
 
 async function App2() {
-    const server = new Server<Events, 'PRIVATE'>({ context: 'PRIVATE' })
-    const client = new Client<Events, 'PRIVATE'>({ context: 'PRIVATE' })
+    const server = new Server<Events, 'PRIVATE'>('PRIVATE')
+    const client = new Client<Events, 'PRIVATE'>('PRIVATE')
 
-    server.get('world', ({ body }, res) => {
+    server.post('world', ({ body }, res) => {
         res.send({ hello: body.world })
     })
 
-    const response = await client.get('world', { world: 'hello' })
+    const response = await client.post('world', { world: 'hello' })
 
     console.log(response)
 }
