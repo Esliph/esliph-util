@@ -10,6 +10,11 @@ export type EventCreateArgs = {
 
 export class ObserverController {
     protected static readonly repository = new ObserverRepository({ isolated: true })
+    private readonly repositoryLocal: ObserverRepository | null
+
+    constructor(repositoryLocal: ObserverRepository | null = null) {
+        this.repositoryLocal = repositoryLocal
+    }
 
     createEvent({ action, name }: EventCreateArgs) {
         const code = randomIdIntWithDate()
@@ -45,6 +50,9 @@ export class ObserverController {
     }
 
     protected get repository() {
+        if (this.repositoryLocal) {
+            return this.repositoryLocal
+        }
         return ObserverController.repository
     }
 }
