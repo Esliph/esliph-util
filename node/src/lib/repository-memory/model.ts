@@ -9,9 +9,9 @@ export class ModelSchema<ModelType extends Types.DocumentDefaultArgs = {}> {
     protected static readonly repository = new Repository()
     protected readonly repositoryIsolated?: Repository
 
-    constructor(public readonly name: string, public options?: ModelSchemaOptions) {
+    constructor(public readonly name: string, public options?: ModelSchemaOptions, repositoryIsolated?: Repository) {
         if (options?.isolated) {
-            this.repositoryIsolated = new Repository()
+            this.repositoryIsolated = repositoryIsolated || new Repository()
         }
 
         this.setup()
