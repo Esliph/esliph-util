@@ -18,6 +18,12 @@ export class EventRouter<Body = any, Res = any> {
             return response.getResponse()
         }
 
+        if (!this.handlers.length) {
+            response
+                .status(HttpStatusCodes.NOT_IMPLEMENTED)
+                .error({ title: 'HTTP Request', message: `Router ${this.request.method} "${this.request.name}" not implemented`, causes: [] })
+        }
+
         for (let i = 0; i < this.handlers.length; i++) {
             const handler = this.handlers[i]
 
@@ -41,7 +47,7 @@ export class EventRouter<Body = any, Res = any> {
                     response.status(err.getStatus()).error(err.getError())
                 } else {
                     response
-                        .status(HttpStatusCodes.BAD_GATEWAY)
+                        .status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
                         .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
                 }
             }
@@ -49,6 +55,10 @@ export class EventRouter<Body = any, Res = any> {
             if (!response.getResponse().isSuccess()) {
                 return response.getResponse()
             }
+        }
+
+        if (!response.hasResponse()) {
+            response.status(HttpStatusCodes.BAD_GATEWAY).error({ title: 'HTTP Request', message: 'No response from server', causes: [] })
         }
 
         return response.getResponse()

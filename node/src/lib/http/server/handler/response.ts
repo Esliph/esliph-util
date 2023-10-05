@@ -37,4 +37,8 @@ export class Response<Res = any> {
     getResponse() {
         return Result.inherit(this.state)
     }
+
+    hasResponse() {
+        return !!this.state.error || !!this.state.value
+    }
 }
