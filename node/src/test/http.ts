@@ -1,5 +1,6 @@
 import { Server } from '../lib/http/server/observers/server'
 import { Client } from '../lib/http/server/observers/client'
+import { EventsRouter } from '../lib/http/server/events'
 
 type Events = {
     'PUBLIC': {
@@ -20,28 +21,28 @@ type Events = {
     }
 }
 
+Client.on<EventsRouter, 'router/start'>('router/start', (args) => {
+    console.log(args)
+})
+Client.on<EventsRouter, 'router/end'>('router/end', (args) => {
+    console.log(args)
+})
+Client.on<EventsRouter, 'success'>('success', (args) => {
+    console.log(args)
+})
+Client.on<EventsRouter, 'error'>('error', (args) => {
+    console.log(args)
+})
+
 async function App() {
     const server = new Server<Events, 'PUBLIC'>('PUBLIC')
     const client = new Client<Events, 'PUBLIC'>('PUBLIC')
-
-    server.on('router/start', (args) => {
-        console.log({ start: args })
-    })
-    server.on('router/end', (args) => {
-        console.log({ end: args })
-    })
-    server.on('success', (args) => {
-        console.log({ success: args })
-    })
-    server.on('error', (args) => {
-        console.log({ error: args })
-    })
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
     })
 
-    const response = await client.get('hello', { hello: 'world' })
+    await client.get('hello', { hello: 'world' })
 }
 
 App()
