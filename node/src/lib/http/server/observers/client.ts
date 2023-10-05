@@ -2,12 +2,15 @@ import { Result } from '../../../result'
 import { EventsModel } from '../controller/model'
 import { ServerController } from '../controller/controller'
 import { Method } from '../model'
+import { ObserverListener } from '../../../observer'
 
-export class Client<ContextEvents extends EventsModel, Context extends keyof ContextEvents> {
+export class Client<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverListener {
     private readonly controller: ServerController
     private context: Context
 
     constructor(context: Context) {
+        super()
+
         this.controller = new ServerController()
         this.context = context
     }

@@ -2,6 +2,7 @@ import { Result } from '../../result'
 import { Request } from './handler/request'
 import { Response } from './handler/response'
 
+export { Request, Response }
 export enum Method {
     GET = 'GET',
     POST = 'POST',

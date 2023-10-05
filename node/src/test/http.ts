@@ -38,7 +38,9 @@ async function App2() {
     const server = new Server<Events, 'PRIVATE'>('PRIVATE')
     const client = new Client<Events, 'PRIVATE'>('PRIVATE')
 
-    server.post('world', ({ body }, res) => {})
+    server.post('world', ({ body }, res) => {
+        return Result.success({ hello: body.world })
+    })
 
     const response = await client.post('world', { world: 'hello' })
 

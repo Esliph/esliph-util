@@ -1,4 +1,4 @@
-import { ErrorResult } from '../../../error'
+import { ErrorResultInfo } from '../../../error'
 import { Result, ResultModel } from '../../../result'
 
 export type ResponseModel<Res = any> = {
@@ -29,8 +29,8 @@ export class Response<Res = any> {
         this.state.ok = true
     }
 
-    error(error: ErrorResult) {
-        this.state.error = error
+    error(error: ErrorResultInfo) {
+        this.state.error = { causes: [], ...error }
         this.state.ok = false
     }
 

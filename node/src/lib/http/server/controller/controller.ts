@@ -23,9 +23,9 @@ export class ServerController {
 
         const eventRouter = new EventRouter(request, router?.handlers || [], !!router)
 
-        const response = await eventRouter.perform()
+        await eventRouter.perform()
 
-        return response
+        return eventRouter.response.getResponse()
     }
 
     protected findRouter({ context, method, name }: { context: string; method: Method; name: string }) {
