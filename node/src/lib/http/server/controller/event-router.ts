@@ -22,7 +22,20 @@ export class EventRouter<Body = any, Res = any> {
             const handler = this.handlers[i]
 
             try {
-                await handler(this.request, response)
+                const responseHandler = await handler(this.request, response)
+
+                if (typeof responseHandler != 'undefined') {
+                    if (responseHandler instanceof Result) {
+                        response.status(responseHandler.getStatus())
+                        if (responseHandler.isSuccess()) {
+                            response.send(responseHandler.getValue())
+                        } else {
+                            response.error(responseHandler.getError())
+                        }
+                    } else {
+                        response.send(responseHandler)
+                    }
+                }
             } catch (err: any) {
                 if (err instanceof Result) {
                     response.status(err.getStatus()).error(err.getError())

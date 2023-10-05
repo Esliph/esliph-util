@@ -1,3 +1,4 @@
+import { Result } from '../../result'
 import { Request } from './handler/request'
 import { Response } from './handler/response'
 
@@ -11,7 +12,7 @@ export enum Method {
     OPTIONS = 'OPTIONS',
 }
 
-export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Response<Res>) => Promise<void> | void
+export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Response<Res>) => Promise<void | Result<Res>> | void | Result<Res> | Res
 
 export type RouterModelArgs = {
     name: string

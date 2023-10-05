@@ -1,5 +1,6 @@
 import { Server } from '../lib/http/server/observers/server'
 import { Client } from '../lib/http/server/observers/client'
+import { Result } from '../lib/result'
 
 type Events = {
     'PUBLIC': {
@@ -38,7 +39,7 @@ async function App2() {
     const client = new Client<Events, 'PRIVATE'>('PRIVATE')
 
     server.post('world', ({ body }, res) => {
-        res.send({ hello: body.world })
+        return Result.success({ hello: body.world })
     })
 
     const response = await client.post('world', { world: 'hello' })
