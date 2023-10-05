@@ -1,6 +1,5 @@
 import { Server } from '../lib/http/server/observers/server'
 import { Client } from '../lib/http/server/observers/client'
-import { Result } from '../lib/result'
 
 type Events = {
     'PUBLIC': {
@@ -25,27 +24,24 @@ async function App() {
     const server = new Server<Events, 'PUBLIC'>('PUBLIC')
     const client = new Client<Events, 'PUBLIC'>('PUBLIC')
 
+    server.on('router/start', (args) => {
+        console.log({ start: args })
+    })
+    server.on('router/end', (args) => {
+        console.log({ end: args })
+    })
+    server.on('success', (args) => {
+        console.log({ success: args })
+    })
+    server.on('error', (args) => {
+        console.log({ error: args })
+    })
+
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
     })
 
     const response = await client.get('hello', { hello: 'world' })
-
-    console.log(response)
-}
-
-async function App2() {
-    const server = new Server<Events, 'PRIVATE'>('PRIVATE')
-    const client = new Client<Events, 'PRIVATE'>('PRIVATE')
-
-    server.post('world', ({ body }, res) => {
-        return Result.success({ hello: body.world })
-    })
-
-    const response = await client.post('world', { world: 'hello' })
-
-    console.log(response)
 }
 
 App()
-App2()

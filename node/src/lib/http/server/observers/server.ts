@@ -1,9 +1,9 @@
 import { ServerController } from '../controller/controller'
 import { EventsModel } from '../controller/model'
 import { HandlerRouter, Method } from '../model'
-import { ObserverListener } from '../../../observer'
+import { ObserverServerListener } from '../observer'
 
-export class Server<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverListener {
+export class Server<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverServerListener {
     private readonly controller: ServerController
     private context: Context
 

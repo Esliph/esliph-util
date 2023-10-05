@@ -1,26 +1,37 @@
-import { ObserverEmitter } from '../../../observer'
 import { Result } from '../../../result'
 import { HttpStatusCodes } from '../../utils/status-code'
 import { Request } from '../handler/request'
 import { Response } from '../handler/response'
 import { HandlerRouter } from '../model'
+import { ObserverServerEmitter } from '../observer'
 
-export class EventRouter<Body = any, Res = any> extends ObserverEmitter {
+export class EventRouter<Body = any, Res = any> {
+    private readonly observer: ObserverServerEmitter
     response: Response<Res>
 
     constructor(private request: Request<Body>, private handlers: HandlerRouter<Body>[], private isExists = true) {
-        super()
-
         this.response = new Response<Res>()
+
+        this.observer = new ObserverServerEmitter()
     }
 
     async perform() {
+        this.observer.emit('router/start', { request: this.request })
+
         if (!this.validEventRouter()) {
             return
         }
 
         await this.performHandlers()
         this.validHasResponse()
+
+        if (this.response.getResponse().isSuccess()) {
+            this.observer.emit('success', { request: this.request, response: this.response.getResponse() })
+        } else {
+            this.observer.emit('error', { request: this.request, response: this.response.getResponse() })
+        }
+
+        this.observer.emit('router/end', { request: this.request, response: this.response.getResponse() })
     }
 
     private validEventRouter() {
@@ -52,6 +63,7 @@ export class EventRouter<Body = any, Res = any> extends ObserverEmitter {
                 isSuccess = await this.performHandler(handler)
             } catch (err: any) {
                 this.handlerPerformedWithError(err)
+                isSuccess = false
             }
 
             if (!isSuccess) {
