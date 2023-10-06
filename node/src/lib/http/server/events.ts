@@ -1,9 +1,9 @@
-import { Result } from '../../result'
 import { Request } from './model'
+import { ResultHttp } from './result-http'
 
 export type EventsRouter = {
     'router/start': { request: Request }
-    'router/end': { response: Result, request: Request }
-    'error': { response: Result, request: Request }
-    'success': { response: Result, request: Request }
+    'router/end': { response: ResultHttp; request: Request }
+    'error': { response: ResultHttp; request: Request }
+    'success': { response: ResultHttp; request: Request }
 }

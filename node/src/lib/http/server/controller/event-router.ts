@@ -1,3 +1,4 @@
+import { randomIdIntWithDate } from '../../../random'
 import { Result } from '../../../result'
 import { HttpStatusCodes } from '../../utils/status-code'
 import { Request } from '../handler/request'
@@ -7,31 +8,54 @@ import { ObserverServerEmitter } from '../observer'
 
 export class EventRouter<Body = any, Res = any> {
     private readonly observer: ObserverServerEmitter
+    private startTimer: number
+    private endTimer: number
     response: Response<Res>
 
     constructor(private request: Request<Body>, private handlers: HandlerRouter<Body>[], private isExists = true) {
         this.response = new Response<Res>()
 
         this.observer = new ObserverServerEmitter()
+        this.startTimer = performance.now()
+        this.endTimer = performance.now()
     }
 
     async perform() {
-        this.observer.emit('router/start', { request: this.request })
+        this.startRouter()
 
         if (!this.validEventRouter()) {
-            return
+            return this.endRouter()
         }
 
         await this.performHandlers()
         this.validHasResponse()
 
+        this.endRouter()
+    }
+
+    private startRouter() {
+        this.startTimer = performance.now()
+
+        this.observer.emit('router/start', { request: this.request })
+    }
+
+    private endRouter() {
+        this.endTimer = performance.now()
+
+        this.response.updateTime(new Date(Date.now()))
+        this.response.updateTimeResponse(this.endTimer - this.startTimer)
+
+        this.endRouterSituation()
+
+        this.observer.emit('router/end', { request: this.request, response: this.response.getResponse() })
+    }
+
+    private endRouterSituation() {
         if (this.response.getResponse().isSuccess()) {
             this.observer.emit('success', { request: this.request, response: this.response.getResponse() })
         } else {
             this.observer.emit('error', { request: this.request, response: this.response.getResponse() })
         }
-
-        this.observer.emit('router/end', { request: this.request, response: this.response.getResponse() })
     }
 
     private validEventRouter() {

@@ -1,13 +1,10 @@
 import { ErrorResultInfo } from '../../../error'
-import { Result, ResultModel } from '../../../result'
+import { ResultHttp, ResultHttpModel } from '../result-http'
 
-export type ResponseModel<Res = any> = {
-    status: number
-    data: Res
-}
+export type ResponseModel<Res = any> = ResultHttpModel<Res>
 
 export class Response<Res = any> {
-    private state: ResultModel<Res>
+    private state: ResponseModel<Res>
 
     constructor() {
         this.state = {
@@ -15,6 +12,8 @@ export class Response<Res = any> {
             error: null,
             value: null,
             status: 200,
+            dateTime: new Date(Date.now()),
+            timeResponse: 0,
         }
     }
 
@@ -34,8 +33,16 @@ export class Response<Res = any> {
         this.state.ok = false
     }
 
+    updateTime(dateTime: Date) {
+        this.state.dateTime = dateTime
+    }
+
+    updateTimeResponse(timeResponse: number) {
+        this.state.timeResponse = Number(timeResponse.toFixed(2))
+    }
+
     getResponse() {
-        return Result.inherit(this.state)
+        return ResultHttp.inherit(this.state)
     }
 
     hasResponse() {

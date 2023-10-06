@@ -21,16 +21,7 @@ type Events = {
     }
 }
 
-Client.on<EventsRouter, 'router/start'>('router/start', (args) => {
-    console.log(args)
-})
-Client.on<EventsRouter, 'router/end'>('router/end', (args) => {
-    console.log(args)
-})
-Client.on<EventsRouter, 'success'>('success', (args) => {
-    console.log(args)
-})
-Client.on<EventsRouter, 'error'>('error', (args) => {
+Client.on<EventsRouter, 'router/end'>('router/end', args => {
     console.log(args)
 })
 
@@ -42,6 +33,9 @@ async function App() {
         res.send({ world: body.hello })
     })
 
+    await client.get('hello', { hello: 'world' })
+    await client.get('hello', { hello: 'world' })
+    await client.get('hello', { hello: 'world' })
     await client.get('hello', { hello: 'world' })
 }
 
