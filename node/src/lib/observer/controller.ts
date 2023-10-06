@@ -37,7 +37,7 @@ export class ObserverController {
     async performEvent(name: string, args: any, context = '') {
         const events = this.repository
             .findMany({
-                where: { name: { equals: name }, ...(context && { context: { equals: context } }) },
+                where: { name: { equals: name }, ...(!!context && { context: { equals: context } }) },
             })
             .map(event => new Event(event))
 

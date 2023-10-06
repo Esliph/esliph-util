@@ -8,18 +8,18 @@ import { ServerRepository } from './repository'
 export class ServerController {
     protected static readonly repository = new ServerRepository({ isolated: true })
 
-    createRouter({ context, handlers, method, name }: RouterModelArgs) {
-        if (this.findRouter({ context, method, name })) {
-            throw new ErrorResult({ title: 'HTTP Server', message: `Already exists router ${method} "${name}" in context "${context}"` })
+    createRouter({ handlers, method, name }: RouterModelArgs) {
+        if (this.findRouter({ name })) {
+            throw new ErrorResult({ title: 'HTTP Server', message: `Already exists router ${method} "${name}"` })
         }
 
-        this.repository.create({ data: { context, handlers, method, name } })
+        this.repository.create({ data: { handlers, method, name } })
     }
 
-    async performRouter<Body = any, Res = any>({ context, method, name, body, headers, params, module, origin }: Omit<RequestModel, 'dateTime'>) {
-        const router = this.findRouter({ context, method, name })
+    async performRouter<Body = any, Res = any>({ method, name, body, headers, params }: Omit<RequestModel, 'dateTime'>) {
+        const router = this.findRouter({ name })
 
-        const request = new Request({ body, context, method, name, headers, params, module, origin })
+        const request = new Request({ body, method, name, headers, params })
 
         const eventRouter = new EventRouter<Body, Res>(request, router?.handlers || ([] as any), !!router)
 
@@ -28,8 +28,8 @@ export class ServerController {
         return eventRouter.response.getResponse()
     }
 
-    protected findRouter({ context, method, name }: { context: string; method: Method; name: string }) {
-        const router = this.repository.findFirst({ where: { context: { equals: context }, method: { equals: method }, name: { equals: name } } })
+    protected findRouter({ name }: { name: string }) {
+        const router = this.repository.findFirst({ where: { name: { equals: name } } })
 
         if (!router) {
             return null

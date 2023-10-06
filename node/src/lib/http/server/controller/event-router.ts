@@ -34,7 +34,7 @@ export class EventRouter<Body = any, Res = any> {
     private startRouter() {
         this.startTimer = performance.now()
 
-        this.observer.emit('router/start', { request: this.request })
+        this.observer.emit('request/start', { request: this.request })
     }
 
     private endRouter() {
@@ -45,14 +45,14 @@ export class EventRouter<Body = any, Res = any> {
 
         this.endRouterSituation()
 
-        this.observer.emit('router/end', { request: this.request, response: this.response.getResponse() })
+        this.observer.emit('request/end', { request: this.request, response: this.response.getResponse() })
     }
 
     private endRouterSituation() {
         if (this.response.getResponse().isSuccess()) {
-            this.observer.emit('success', { request: this.request, response: this.response.getResponse() })
+            this.observer.emit('request/success', { request: this.request, response: this.response.getResponse() })
         } else {
-            this.observer.emit('error', { request: this.request, response: this.response.getResponse() })
+            this.observer.emit('request/error', { request: this.request, response: this.response.getResponse() })
         }
     }
 

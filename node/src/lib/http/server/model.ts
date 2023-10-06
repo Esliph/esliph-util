@@ -18,14 +18,12 @@ export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Res
 
 export type RouterModelArgs = {
     name: string
-    context: string
     method: Method
     handlers: HandlerRouter[]
 }
 
 export type RouterModel<Context extends string, Name extends string, Body = any> = {
     name: Name
-    context: Context
     method: Method
     handlers: HandlerRouter<Name, Body>[]
 }

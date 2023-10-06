@@ -34,17 +34,19 @@ type EventsPrivate = {
     'OPTIONS': {}
 }
 
+Server.on('request/end', arg => {
+    console.log(arg)
+})
+
 async function App() {
-    const server = new Server<EventsPublic>({ context: 'PUBLIC' })
-    const client = new Client<EventsPublic>({ context: 'PUBLIC', origin: 'Teste' })
+    const server = new Server<EventsPublic>({})
+    const client = new Client<EventsPublic>({})
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
     })
 
     const response = await client.get('hello', { hello: 'test' })
-
-    console.log(response.getValue())
 }
 
 App()
