@@ -5,7 +5,7 @@ export type RequestModel<Body = any> = {
     method: Method
     name: string
     context: string
-    origem: string
+    origin: string
     module: string
     params: { [x: string]: any }
     headers: { [x: string]: any }
@@ -20,7 +20,7 @@ export class Request<Body = any> implements RequestModel<Body> {
     params: { [x: string]: any }
     dateTime: Date
     headers: { [x: string]: any }
-    origem: string
+    origin: string
     module: string
 
     constructor({
@@ -30,7 +30,7 @@ export class Request<Body = any> implements RequestModel<Body> {
         name = '',
         params = {},
         headers = {},
-        origem = '',
+        origin = '',
         module = '',
         dateTime = new Date(Date.now()),
     }: Partial<RequestModel<Body>>) {
@@ -41,7 +41,7 @@ export class Request<Body = any> implements RequestModel<Body> {
         this.name = name
         this.params = params
         this.dateTime = dateTime
-        this.origem = origem
+        this.origin = origin
         this.module = module
     }
 }

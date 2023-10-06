@@ -36,7 +36,7 @@ type EventsPrivate = {
 
 async function App() {
     const server = new Server<EventsPublic>({ context: 'PUBLIC' })
-    const client = new Client<EventsPublic>({ context: 'PUBLIC', origem: 'Teste' })
+    const client = new Client<EventsPublic>({ context: 'PUBLIC', origin: 'Teste' })
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })

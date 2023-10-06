@@ -8,7 +8,7 @@ import { ResultHttp } from '../result-http'
 export type RequestOption = {
     headers: { [x: string]: any }
     params: { [x: string]: any }
-    origem: string
+    origin: string
     module: string
     context: string
 }
@@ -18,13 +18,13 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
     private requestOptions: RequestOption
 
     constructor(requestOptions: Partial<RequestOption> = {}) {
-        super(requestOptions.origem)
+        super(requestOptions.origin)
 
         this.controller = new ServerController()
         this.requestOptions = {
             headers: {},
             params: {},
-            origem: '',
+            origin: '',
             module: '',
             context: '',
             ...requestOptions,
@@ -127,7 +127,7 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
             headers: fullOptions.headers,
             params: fullOptions.params,
             module: fullOptions.module,
-            origem: fullOptions.origem,
+            origin: fullOptions.origin,
         })
 
         return response

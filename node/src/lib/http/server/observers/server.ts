@@ -4,7 +4,7 @@ import { HandlerRouter, Method } from '../model'
 import { ObserverServerListener } from '../observer'
 
 export type ServerOption = {
-    origem: string
+    origin: string
     context: string
 }
 
@@ -13,11 +13,11 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
     private requestOptions: ServerOption
 
     constructor(requestOptions: Partial<ServerOption> = {}) {
-        super(requestOptions.origem)
+        super(requestOptions.origin)
 
         this.controller = new ServerController()
         this.requestOptions = {
-            origem: '',
+            origin: '',
             context: '',
             ...requestOptions,
         }
