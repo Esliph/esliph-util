@@ -1,8 +1,9 @@
 import { Result } from '../../result'
+import { EventsRouter } from './events'
 import { Request } from './handler/request'
 import { Response } from './handler/response'
 
-export { Request, Response }
+export { Request, Response, EventsRouter }
 export enum Method {
     GET = 'GET',
     POST = 'POST',
