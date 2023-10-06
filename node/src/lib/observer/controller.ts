@@ -4,6 +4,7 @@ import { Event } from './event'
 import { randomIdIntWithDate } from '../random'
 
 export type EventCreateArgs = {
+    context?: string
     name: string
     action: Action
 }
@@ -16,9 +17,9 @@ export class ObserverController {
         this.repositoryLocal = repositoryLocal
     }
 
-    createEvent({ action, name }: EventCreateArgs) {
+    createEvent({ action, name, context = '' }: EventCreateArgs) {
         const code = randomIdIntWithDate()
-        const event: EventModel<typeof name> = { code, action, name }
+        const event: EventModel<typeof name> = { code, action, name, context }
 
         this.repository.create({
             data: { ...event },
@@ -33,10 +34,10 @@ export class ObserverController {
         })
     }
 
-    async performEvent(name: string, args: any) {
+    async performEvent(name: string, args: any, context = '') {
         const events = this.repository
             .findMany({
-                where: { name: { equals: name } },
+                where: { name: { equals: name }, ...(context ? { context: { equals: context } } : { context: { filled: false } }) },
             })
             .map(event => new Event(event))
 

@@ -3,18 +3,26 @@ import { Action } from '../model'
 import { ObserverRepository } from '../repository'
 import { ObserverEvent } from './model'
 
+export type ObserverListenerOptions = {
+    context: string
+    isLocal: boolean
+}
+
 export class ObserverListener<Events extends ObserverEvent = any> {
     private static readonly _controllerObserver: ObserverController = new ObserverController()
     private readonly _controllerObserver: ObserverController
-    private readonly isLocal: boolean
+    private options: ObserverListenerOptions
 
-    constructor(repositoryLocal: ObserverRepository | null = null) {
+    constructor(options: Partial<ObserverListenerOptions> = {}, repositoryLocal: ObserverRepository | null = null) {
         this._controllerObserver = new ObserverController(repositoryLocal)
-        this.isLocal = !!repositoryLocal
+        this.options = {
+            context: options.context || '',
+            isLocal: !!options.isLocal,
+        }
     }
 
-    on<Event extends keyof Events>(name: Event, action: Action<Events[Event]>) {
-        return this.controllerObserver.createEvent({ action, name: name as string })
+    on<Event extends keyof Events>(name: Event, action: Action<Events[Event]>, context = this.options.context) {
+        return this.controllerObserver.createEvent({ action, name: name as string, context })
     }
 
     removeListener(code: number) {
@@ -30,7 +38,9 @@ export class ObserverListener<Events extends ObserverEvent = any> {
     }
 
     private get controllerObserver() {
-        if (this.isLocal) { return this._controllerObserver }
+        if (this.options.isLocal) {
+            return this._controllerObserver
+        }
         return ObserverListener._controllerObserver
     }
 }
