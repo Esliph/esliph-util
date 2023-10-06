@@ -1,4 +1,4 @@
-import { Request } from './model'
+import { Request } from './handler/request'
 import { ResultHttp } from './result-http'
 
 export type EventsRouter = {

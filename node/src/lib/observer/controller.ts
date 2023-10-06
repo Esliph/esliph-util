@@ -2,6 +2,7 @@ import { ObserverRepository } from './repository'
 import { Action, EventModel } from './model'
 import { Event } from './event'
 import { randomIdIntWithDate } from '../random'
+import console from 'console'
 
 export type EventCreateArgs = {
     context?: string

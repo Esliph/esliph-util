@@ -8,9 +8,7 @@ import { ResultHttp } from '../result-http'
 export type RequestOption = {
     headers: { [x: string]: any }
     params: { [x: string]: any }
-    origin: string
-    module: string
-    context: string
+    access: string, context: string, module: string, origin: string
 }
 
 export class Client<Events extends EventsModel> extends ObserverServerListener {
@@ -18,15 +16,16 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
     private requestOptions: RequestOption
 
     constructor(requestOptions: Partial<RequestOption> = {}) {
-        super(requestOptions.origin)
+        super()
 
         this.controller = new ServerController()
         this.requestOptions = {
             headers: {},
             params: {},
-            origin: '',
-            module: '',
+            access: '',
             context: '',
+            module: '',
+            origin: '',
             ...requestOptions,
         }
     }
@@ -123,11 +122,7 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
             name,
             body,
             method,
-            context: fullOptions.context,
-            headers: fullOptions.headers,
-            params: fullOptions.params,
-            module: fullOptions.module,
-            origin: fullOptions.origin,
+            ...fullOptions
         })
 
         return response

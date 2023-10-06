@@ -1,5 +1,6 @@
 import { Server } from '../lib/http/server/observers/server'
 import { Client } from '../lib/http/server/observers/client'
+import { EventsRouter } from '../lib/http/server/events'
 
 type EventsPublic = {
     'GET': {
@@ -34,19 +35,19 @@ type EventsPrivate = {
     'OPTIONS': {}
 }
 
-Server.on('request/end', arg => {
+Server.on<EventsRouter, 'request/end'>('request/end', arg => {
     console.log(arg)
-})
+}, 'Teste')
 
 async function App() {
-    const server = new Server<EventsPublic>({})
-    const client = new Client<EventsPublic>({})
+    const server = new Server<EventsPublic>({ access: 'Teste' })
+    const client = new Client<EventsPublic>({ access: 'Teste' })
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
     })
 
-    const response = await client.get('hello', { hello: 'test' })
+    const response = await client.get('hello', { hello: 'test' }, { access: 'Teste' })
 }
 
 App()

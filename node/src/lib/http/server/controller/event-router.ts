@@ -34,7 +34,7 @@ export class EventRouter<Body = any, Res = any> {
     private startRouter() {
         this.startTimer = performance.now()
 
-        this.observer.emit('request/start', { request: this.request })
+        this.observer.emit('request/start', { request: this.request }, this.request.access)
     }
 
     private endRouter() {
@@ -45,14 +45,14 @@ export class EventRouter<Body = any, Res = any> {
 
         this.endRouterSituation()
 
-        this.observer.emit('request/end', { request: this.request, response: this.response.getResponse() })
+        this.observer.emit('request/end', { request: this.request, response: this.response.getResponse() }, this.request.access)
     }
 
     private endRouterSituation() {
         if (this.response.getResponse().isSuccess()) {
-            this.observer.emit('request/success', { request: this.request, response: this.response.getResponse() })
+            this.observer.emit('request/success', { request: this.request, response: this.response.getResponse() }, this.request.access)
         } else {
-            this.observer.emit('request/error', { request: this.request, response: this.response.getResponse() })
+            this.observer.emit('request/error', { request: this.request, response: this.response.getResponse() }, this.request.access)
         }
     }
 
@@ -60,7 +60,7 @@ export class EventRouter<Body = any, Res = any> {
         if (!this.isExists) {
             this.response
                 .status(HttpStatusCodes.NOT_FOUND)
-                .error({ title: 'HTTP Request', message: `Router ${this.request.method} "${this.request.name}" not found` })
+                .error({ title: 'HTTP Request', message: `Router ${!!this.request.access && `[${this.request.access}] `}${this.request.method} "${this.request.name}" not found` })
 
             return false
         }

@@ -29,7 +29,7 @@ export class ObserverListener<Events extends ObserverEvent = any> {
         this.controllerObserver.removeEvent(code)
     }
 
-    static on<Events extends ObserverEvent, Event extends keyof Events>(name: Event, action: Action<Events[Event]>, context = '') {
+    static on<Events extends ObserverEvent, Event extends keyof ObserverEvent>(name: Event, action: Action<Events[Event]>, context = '') {
         return this._controllerObserver.createEvent({ action, name: name as string, context })
     }
 
