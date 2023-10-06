@@ -9,17 +9,17 @@ export type ObserverEmitterOptions = {
 
 export class ObserverEmitter<Events extends ObserverEvent = any> {
     private readonly controllerObserver: ObserverController
-    private options: ObserverEmitterOptions
+    private _options: ObserverEmitterOptions
 
     constructor(options: Partial<ObserverEmitterOptions> = {}, repositoryLocal: ObserverRepository | null = null) {
         this.controllerObserver = new ObserverController(repositoryLocal)
-        this.options = {
+        this._options = {
             context: options.context || '',
             isLocal: !!options.isLocal,
         }
     }
 
-    async emit<Event extends keyof Events>(name: Event, data: Events[Event], context = this.options.context) {
+    async emit<Event extends keyof Events>(name: Event, data: Events[Event], context = this._options.context) {
         await this.controllerObserver.performEvent(name as string, data, context)
     }
 }

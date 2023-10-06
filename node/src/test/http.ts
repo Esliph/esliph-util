@@ -35,7 +35,7 @@ type EventsPrivate = {
 }
 
 async function App() {
-    const server = new Server<EventsPublic>('PUBLIC')
+    const server = new Server<EventsPublic>({ context: 'PUBLIC' })
     const client = new Client<EventsPublic>({ context: 'PUBLIC', origem: 'Teste' })
 
     server.get('hello', ({ body }, res) => {

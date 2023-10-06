@@ -3,15 +3,24 @@ import { EventsModel } from '../controller/model'
 import { HandlerRouter, Method } from '../model'
 import { ObserverServerListener } from '../observer'
 
+export type ServerOption = {
+    origem: string
+    context: string
+}
+
 export class Server<ContextEvents extends EventsModel> extends ObserverServerListener {
     private readonly controller: ServerController
-    private context: string
+    private requestOptions: ServerOption
 
-    constructor(context: string) {
-        super()
+    constructor(requestOptions: Partial<ServerOption> = {}) {
+        super(requestOptions.origem)
 
         this.controller = new ServerController()
-        this.context = context
+        this.requestOptions = {
+            origem: '',
+            context: '',
+            ...requestOptions,
+        }
     }
 
     get<Event extends keyof ContextEvents['GET']>(
@@ -64,6 +73,6 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
     }
 
     private createRouter(method: Method, name: string, handlers: HandlerRouter[]) {
-        this.controller.createRouter({ context: this.context as string, handlers, method, name })
+        this.controller.createRouter({ context: this.requestOptions.context as string, handlers, method, name })
     }
 }
