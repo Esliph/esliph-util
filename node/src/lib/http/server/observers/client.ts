@@ -16,7 +16,7 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
     private requestOptions: RequestOption
 
     constructor(requestOptions: Partial<RequestOption> = {}) {
-        super()
+        super(requestOptions.context)
 
         this.controller = new ServerController()
         this.requestOptions = {

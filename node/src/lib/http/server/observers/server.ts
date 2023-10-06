@@ -12,7 +12,7 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
     private requestOptions: ServerOption
 
     constructor(requestOptions: Partial<ServerOption> = {}) {
-        super()
+        super(requestOptions.context)
 
         this.controller = new ServerController()
         this.requestOptions = {
@@ -71,6 +71,6 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
     }
 
     private createRouter(method: Method, name: string, handlers: HandlerRouter[]) {
-        this.controller.createRouter({ handlers, method, name, access: this.requestOptions.access, context: this.requestOptions.context, module: this.requestOptions.module })
+        this.controller.createRouter({ handlers, method, name, ...this.requestOptions })
     }
 }
