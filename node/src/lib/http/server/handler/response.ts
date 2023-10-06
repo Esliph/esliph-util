@@ -42,7 +42,7 @@ export class Response<Res = any> {
     }
 
     getResponse() {
-        return ResultHttp.inherit(this.state)
+        return ResultHttp.inherit<Res>(this.state)
     }
 
     hasResponse() {

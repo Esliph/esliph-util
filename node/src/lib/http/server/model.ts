@@ -5,13 +5,13 @@ import { Response } from './handler/response'
 
 export { Request, Response, EventsRouter }
 export enum Method {
-    GET = 'GET',
-    POST = 'POST',
-    PUT = 'PUT',
-    PATCH = 'PATCH',
-    DELETE = 'DELETE',
-    HEAD = 'HEAD',
-    OPTIONS = 'OPTIONS',
+    'GET' = 'GET',
+    'POST' = 'POST',
+    'PUT' = 'PUT',
+    'PATCH' = 'PATCH',
+    'DELETE' = 'DELETE',
+    'HEAD' = 'HEAD',
+    'OPTIONS' = 'OPTIONS',
 }
 
 export type HandlerRouter<Body = any, Res = any> = (req: Request<Body>, res: Response<Res>) => Promise<void | Result<Res>> | void | Result<Res> | Res

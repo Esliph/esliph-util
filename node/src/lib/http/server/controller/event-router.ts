@@ -1,4 +1,3 @@
-import { randomIdIntWithDate } from '../../../random'
 import { Result } from '../../../result'
 import { HttpStatusCodes } from '../../utils/status-code'
 import { Request } from '../handler/request'
@@ -12,9 +11,8 @@ export class EventRouter<Body = any, Res = any> {
     private endTimer: number
     response: Response<Res>
 
-    constructor(private request: Request<Body>, private handlers: HandlerRouter<Body>[], private isExists = true) {
+    constructor(private request: Request<Body>, private handlers: HandlerRouter<Body, Res>[], private isExists = true) {
         this.response = new Response<Res>()
-
         this.observer = new ObserverServerEmitter()
         this.startTimer = performance.now()
         this.endTimer = performance.now()

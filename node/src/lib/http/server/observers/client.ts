@@ -1,128 +1,129 @@
-import { Result } from '../../../result'
 import { EventsModel } from '../controller/model'
 import { ServerController } from '../controller/controller'
 import { Method } from '../model'
 import { ObserverServerListener } from '../observer'
 import { deepMerge } from '../../../repository-memory/util'
+import { ResultHttp } from '../result-http'
 
 export type RequestOption = {
     headers: { [x: string]: any }
     params: { [x: string]: any }
     origem: string
     module: string
+    context: string
 }
 
-export class Client<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverServerListener {
+export class Client<Events extends EventsModel> extends ObserverServerListener {
     private readonly controller: ServerController
-    private context: Context
     private requestOptions: RequestOption
 
-    constructor(context: Context, requestOptions: Partial<RequestOption> = {}) {
+    constructor(requestOptions: Partial<RequestOption> = {}) {
         super()
 
         this.controller = new ServerController()
-        this.context = context
         this.requestOptions = {
             headers: {},
             params: {},
             origem: '',
             module: '',
+            context: '',
             ...requestOptions,
         }
     }
 
-    async get<Event extends keyof ContextEvents[Context]['GET']>(
+    async get<Event extends keyof Events['GET']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['GET'][Event]['body'],
+        body?: Events['GET'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['GET'][Event]['response']>> {
-        const response = await this.performRouter(Method.GET, name as string, body, options)
+    ): Promise<ResultHttp<Events['GET'][Event]['response']>> {
+        const response = await this.performRouter<Events['GET'][Event]['body'], Events['GET'][Event]['response']>(Method.GET, name as string, body, options)
 
         return response
     }
 
-    async post<Event extends keyof ContextEvents[Context]['POST']>(
+    async post<Event extends keyof Events['POST']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['POST'][Event]['body'],
+        body?: Events['POST'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['POST'][Event]['response']>> {
-        const response = await this.performRouter(Method.POST, name as string, body, options)
+    ): Promise<ResultHttp<Events['POST'][Event]['response']>> {
+        const response = await this.performRouter<Events['POST'][Event]['body'], Events['POST'][Event]['response']>(Method.POST, name as string, body, options)
 
         return response
     }
 
-    async put<Event extends keyof ContextEvents[Context]['PUT']>(
+    async put<Event extends keyof Events['PUT']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['PUT'][Event]['body'],
+        body?: Events['PUT'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['PUT'][Event]['response']>> {
-        const response = await this.performRouter(Method.PUT, name as string, body, options)
+    ): Promise<ResultHttp<Events['PUT'][Event]['response']>> {
+        const response = await this.performRouter<Events['PUT'][Event]['body'], Events['PUT'][Event]['response']>(Method.PUT, name as string, body, options)
 
         return response
     }
 
-    async patch<Event extends keyof ContextEvents[Context]['PATCH']>(
+    async patch<Event extends keyof Events['PATCH']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['PATCH'][Event]['body'],
+        body?: Events['PATCH'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['PATCH'][Event]['response']>> {
-        const response = await this.performRouter(Method.PATCH, name as string, body, options)
+    ): Promise<ResultHttp<Events['PATCH'][Event]['response']>> {
+        const response = await this.performRouter<Events['PATCH'][Event]['body'], Events['PATCH'][Event]['response']>(
+            Method.PATCH,
+            name as string,
+            body,
+            options
+        )
 
         return response
     }
 
-    async delete<Event extends keyof ContextEvents[Context]['DELETE']>(
+    async delete<Event extends keyof Events['DELETE']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['DELETE'][Event]['body'],
+        body?: Events['DELETE'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['DELETE'][Event]['response']>> {
-        const response = await this.performRouter(Method.DELETE, name as string, body, options)
+    ): Promise<ResultHttp<Events['DELETE'][Event]['response']>> {
+        const response = await this.performRouter<Events['DELETE'][Event]['body'], Events['DELETE'][Event]['response']>(
+            Method.DELETE,
+            name as string,
+            body,
+            options
+        )
 
         return response
     }
 
-    async head<Event extends keyof ContextEvents[Context]['HEAD']>(
+    async head<Event extends keyof Events['HEAD']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['HEAD'][Event]['body'],
+        body?: Events['HEAD'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['HEAD'][Event]['response']>> {
-        const response = await this.performRouter(Method.GET, name as string, body, options)
+    ): Promise<ResultHttp<Events['HEAD'][Event]['response']>> {
+        const response = await this.performRouter<Events['HEAD'][Event]['body'], Events['HEAD'][Event]['response']>(Method.GET, name as string, body, options)
 
         return response
     }
 
-    async options<Event extends keyof ContextEvents[Context]['OPTIONS']>(
+    async options<Event extends keyof Events['OPTIONS']>(
         name: Event,
-        // @ts-expect-error
-        body: ContextEvents[Context]['OPTIONS'][Event]['body'],
+        body?: Events['OPTIONS'][Event]['body'],
         options?: Partial<RequestOption>
-        // @ts-expect-error
-    ): Promise<Result<ContextEvents[Context]['OPTIONS'][Event]['response']>> {
-        const response = await this.performRouter(Method.OPTIONS, name as string, body, options)
+    ): Promise<ResultHttp<Events['OPTIONS'][Event]['response']>> {
+        const response = await this.performRouter<Events['OPTIONS'][Event]['body'], Events['OPTIONS'][Event]['response']>(
+            Method.OPTIONS,
+            name as string,
+            body,
+            options
+        )
 
         return response
     }
 
-    private async performRouter(method: Method, name: string, body: any, options: Partial<RequestOption> = {}) {
+    private async performRouter<Body = any, Res = any>(method: Method, name: string, body: any = {}, options: Partial<RequestOption> = {}) {
         const fullOptions = deepMerge({}, this.requestOptions, options) as RequestOption
 
-        const response = await this.controller.performRouter({
+        const response = await this.controller.performRouter<Body, Res>({
             name,
             body,
-            context: this.context as string,
             method,
+            context: fullOptions.context,
             headers: fullOptions.headers,
             params: fullOptions.params,
             module: fullOptions.module,

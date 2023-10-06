@@ -3,69 +3,62 @@ import { EventsModel } from '../controller/model'
 import { HandlerRouter, Method } from '../model'
 import { ObserverServerListener } from '../observer'
 
-export class Server<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverServerListener {
+export class Server<ContextEvents extends EventsModel> extends ObserverServerListener {
     private readonly controller: ServerController
-    private context: Context
+    private context: string
 
-    constructor(context: Context) {
+    constructor(context: string) {
         super()
 
         this.controller = new ServerController()
         this.context = context
     }
 
-    get<Event extends keyof ContextEvents[Context]['GET']>(
+    get<Event extends keyof ContextEvents['GET']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['GET'][Event]['body'], ContextEvents[Context]['GET'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['GET'][Event]['body'], ContextEvents['GET'][Event]['response']>[]
     ) {
         this.createRouter(Method.GET, name as string, handlers)
     }
 
-    post<Event extends keyof ContextEvents[Context]['POST']>(
+    post<Event extends keyof ContextEvents['POST']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['POST'][Event]['body'], ContextEvents[Context]['POST'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['POST'][Event]['body'], ContextEvents['POST'][Event]['response']>[]
     ) {
         this.createRouter(Method.POST, name as string, handlers)
     }
 
-    put<Event extends keyof ContextEvents[Context]['PUT']>(
+    put<Event extends keyof ContextEvents['PUT']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['PUT'][Event]['body'], ContextEvents[Context]['PUT'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['PUT'][Event]['body'], ContextEvents['PUT'][Event]['response']>[]
     ) {
         this.createRouter(Method.PUT, name as string, handlers)
     }
 
-    patch<Event extends keyof ContextEvents[Context]['PATCH']>(
+    patch<Event extends keyof ContextEvents['PATCH']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['PATCH'][Event]['body'], ContextEvents[Context]['PATCH'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['PATCH'][Event]['body'], ContextEvents['PATCH'][Event]['response']>[]
     ) {
         this.createRouter(Method.PATCH, name as string, handlers)
     }
 
-    delete<Event extends keyof ContextEvents[Context]['DELETE']>(
+    delete<Event extends keyof ContextEvents['DELETE']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['DELETE'][Event]['body'], ContextEvents[Context]['DELETE'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['DELETE'][Event]['body'], ContextEvents['DELETE'][Event]['response']>[]
     ) {
         this.createRouter(Method.DELETE, name as string, handlers)
     }
 
-    head<Event extends keyof ContextEvents[Context]['HEAD']>(
+    head<Event extends keyof ContextEvents['HEAD']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['HEAD'][Event]['body'], ContextEvents[Context]['HEAD'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['HEAD'][Event]['body'], ContextEvents['HEAD'][Event]['response']>[]
     ) {
         this.createRouter(Method.HEAD, name as string, handlers)
     }
 
-    options<Event extends keyof ContextEvents[Context]['OPTIONS']>(
+    options<Event extends keyof ContextEvents['OPTIONS']>(
         name: Event,
-        // @ts-expect-error
-        ...handlers: HandlerRouter<ContextEvents[Context]['OPTIONS'][Event]['body'], ContextEvents[Context]['OPTIONS'][Event]['response']>[]
+        ...handlers: HandlerRouter<ContextEvents['OPTIONS'][Event]['body'], ContextEvents['OPTIONS'][Event]['response']>[]
     ) {
         this.createRouter(Method.OPTIONS, name as string, handlers)
     }
