@@ -1,5 +1,5 @@
 import { ErrorResult } from '../../../error'
-import { Request } from '../handler/request'
+import { Request, RequestModel } from '../handler/request'
 import { Method, RouterModelArgs } from '../model'
 import { Router } from '../router/router'
 import { EventRouter } from './event-router'
@@ -16,10 +16,10 @@ export class ServerController {
         this.repository.create({ data: { context, handlers, method, name } })
     }
 
-    async performRouter({ context, method, name, body }: { context: string; method: Method; name: string; body: any }) {
+    async performRouter({ context, method, name, body, headers, params }: Omit<RequestModel, 'dateTime'>) {
         const router = this.findRouter({ context, method, name })
 
-        const request = new Request({ body, context, method, name })
+        const request = new Request({ body, context, method, name, headers, params })
 
         const eventRouter = new EventRouter(request, router?.handlers || [], !!router)
 
