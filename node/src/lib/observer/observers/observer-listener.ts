@@ -11,17 +11,17 @@ export type ObserverListenerOptions = {
 export class ObserverListener<Events extends ObserverEvent = any> {
     private static readonly _controllerObserver: ObserverController = new ObserverController()
     private readonly _controllerObserver: ObserverController
-    private options: ObserverListenerOptions
+    private _options: ObserverListenerOptions
 
     constructor(options: Partial<ObserverListenerOptions> = {}, repositoryLocal: ObserverRepository | null = null) {
         this._controllerObserver = new ObserverController(repositoryLocal)
-        this.options = {
+        this._options = {
             context: options.context || '',
             isLocal: !!options.isLocal,
         }
     }
 
-    on<Event extends keyof Events>(name: Event, action: Action<Events[Event]>, context = this.options.context) {
+    on<Event extends keyof Events>(name: Event, action: Action<Events[Event]>, context = this._options.context) {
         return this.controllerObserver.createEvent({ action, name: name as string, context })
     }
 
@@ -38,7 +38,7 @@ export class ObserverListener<Events extends ObserverEvent = any> {
     }
 
     private get controllerObserver() {
-        if (this.options.isLocal) {
+        if (this._options.isLocal) {
             return this._controllerObserver
         }
         return ObserverListener._controllerObserver
