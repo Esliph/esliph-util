@@ -3,21 +3,32 @@ import { EventsModel } from '../controller/model'
 import { ServerController } from '../controller/controller'
 import { Method } from '../model'
 import { ObserverServerListener } from '../observer'
+import { deepMerge } from '../../../repository-memory/util'
 
 export type RequestOption = {
     headers: { [x: string]: any }
     params: { [x: string]: any }
+    origem: string
+    module: string
 }
 
 export class Client<ContextEvents extends EventsModel, Context extends keyof ContextEvents> extends ObserverServerListener {
     private readonly controller: ServerController
     private context: Context
+    private requestOptions: RequestOption
 
-    constructor(context: Context) {
+    constructor(context: Context, requestOptions: Partial<RequestOption> = {}) {
         super()
 
         this.controller = new ServerController()
         this.context = context
+        this.requestOptions = {
+            headers: {},
+            params: {},
+            origem: '',
+            module: '',
+            ...requestOptions,
+        }
     }
 
     async get<Event extends keyof ContextEvents[Context]['GET']>(
@@ -105,13 +116,17 @@ export class Client<ContextEvents extends EventsModel, Context extends keyof Con
     }
 
     private async performRouter(method: Method, name: string, body: any, options: Partial<RequestOption> = {}) {
+        const fullOptions = deepMerge({}, this.requestOptions, options) as RequestOption
+
         const response = await this.controller.performRouter({
             name,
             body,
             context: this.context as string,
             method,
-            headers: options.headers || {},
-            params: options.params || {},
+            headers: fullOptions.headers,
+            params: fullOptions.params,
+            module: fullOptions.module,
+            origem: fullOptions.origem,
         })
 
         return response

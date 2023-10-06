@@ -16,10 +16,10 @@ export class ServerController {
         this.repository.create({ data: { context, handlers, method, name } })
     }
 
-    async performRouter({ context, method, name, body, headers, params }: Omit<RequestModel, 'dateTime'>) {
+    async performRouter({ context, method, name, body, headers, params, module, origem }: Omit<RequestModel, 'dateTime'>) {
         const router = this.findRouter({ context, method, name })
 
-        const request = new Request({ body, context, method, name, headers, params })
+        const request = new Request({ body, context, method, name, headers, params, module, origem })
 
         const eventRouter = new EventRouter(request, router?.handlers || [], !!router)
 

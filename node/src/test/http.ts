@@ -27,7 +27,7 @@ Client.on<EventsRouter, 'router/end'>('router/end', args => {
 
 async function App() {
     const server = new Server<Events, 'PUBLIC'>('PUBLIC')
-    const client = new Client<Events, 'PUBLIC'>('PUBLIC')
+    const client = new Client<Events, 'PUBLIC'>('PUBLIC', { origem: 'Teste' })
 
     server.get('hello', ({ body }, res) => {
         res.send({ world: body.hello })
@@ -36,7 +36,7 @@ async function App() {
     await client.get('hello', { hello: 'world' })
     await client.get('hello', { hello: 'world' })
     await client.get('hello', { hello: 'world' })
-    await client.get('hello', { hello: 'world' })
+    await client.get('hello', { hello: 'world' }, { origem: 'T', module: 'ABC', headers: { auth: 'abcd' }, params: { id: 0 } })
 }
 
 App()
