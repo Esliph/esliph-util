@@ -8,6 +8,7 @@ export interface ResultExceptionArgs {
     message: string
     description?: string
     status?: number
+    stack?: string
     causes?: { message: string; origin?: string }[]
 }
 
@@ -19,7 +20,7 @@ export class ResultException<T = any> extends Error implements ResultExceptionMo
     readonly value: any
     readonly error: ErrorResult
 
-    constructor({ message, description, title, status = 0, causes = [] }: ResultExceptionArgs) {
+    constructor({ message, description, title, status = 0, causes = [], stack = '' }: ResultExceptionArgs) {
         super()
 
         this.message = message
@@ -31,11 +32,12 @@ export class ResultException<T = any> extends Error implements ResultExceptionMo
             message,
             title: title || this.constructor.name.match(/[A-Z][a-z]+|[0-9]+/g)?.join(' ') || 'Error',
             description,
+            stack,
         }
     }
 
     getError() {
-        return { descriptions: this.getStack() || '', ...this.error, status: this.status }
+        return { ...this.error, status: this.status }
     }
     getTitle() {
         return this.error.title

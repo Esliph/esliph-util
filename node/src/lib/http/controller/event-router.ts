@@ -131,7 +131,7 @@ export class EventRouter<Body = any, Res = any> {
 
         return this.response
             .status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
-            .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
+            .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message }], stack: err.stack })
     }
 
     private notResponseHandlers() {
