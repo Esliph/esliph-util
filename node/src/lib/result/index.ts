@@ -41,7 +41,7 @@ export class ResultModelBase<ResultValueModel = any> {
     }
 }
 
-export class Result<ResultValueModel = any> extends ResultModelBase {
+export class Result<ResultValueModel = any> extends ResultModelBase<ResultValueModel> {
     constructor(resultModel: ResultModel<ResultValueModel>) {
         super(resultModel)
     }
