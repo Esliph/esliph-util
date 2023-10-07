@@ -1,6 +1,6 @@
 {
     "name": "@esliph/util-node",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "",
     "main": "dist/index.js",
     "types": "index.d.ts",
