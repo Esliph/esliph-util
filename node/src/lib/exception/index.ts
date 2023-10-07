@@ -32,7 +32,7 @@ export class ResultException<T = any> extends Error implements ResultExceptionMo
             message,
             title: title || this.constructor.name.match(/[A-Z][a-z]+|[0-9]+/g)?.join(' ') || 'Error',
             description,
-            stack,
+            stack: stack || super.stack,
         }
     }
 
