@@ -1,5 +1,5 @@
 import { EventsRouter } from './events'
-import { ObserverEmitter, ObserverListener } from '../../observer'
+import { ObserverEmitter, ObserverListener } from '../observer'
 
 export class ObserverServerListener extends ObserverListener<EventsRouter> {
     constructor(context = '') {
