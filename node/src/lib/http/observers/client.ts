@@ -30,6 +30,10 @@ export class Client<Events extends EventsModel> extends ObserverServerListener {
         }
     }
 
+    use(requestOptions: Partial<RequestOption> = {}) {
+        this.requestOptions = deepMerge({}, this.requestOptions, requestOptions)
+    }
+
     async get<Event extends keyof Events['GET']>(
         name: Event,
         body?: Events['GET'][Event]['body'],

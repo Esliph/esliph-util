@@ -1,3 +1,4 @@
+import { deepMerge } from '../../repository-memory/util'
 import { ServerController } from '../controller/controller'
 import { EventsModel } from '../controller/model'
 import { HandlerRouter, Method } from '../model'
@@ -19,6 +20,10 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
             access: '', context: '', module: '',
             ...requestOptions,
         }
+    }
+
+    use(requestOptions: Partial<ServerOption> = {}) {
+        this.requestOptions = deepMerge({}, this.requestOptions, requestOptions)
     }
 
     get<Event extends keyof ContextEvents['GET']>(
