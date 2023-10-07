@@ -60,7 +60,7 @@ export class EventRouter<Body = any, Res = any> {
         if (!this.isExists) {
             this.response
                 .status(HttpStatusCodes.NOT_FOUND)
-                .error({ title: 'HTTP Request', message: `Router ${!!this.request.access && `[${this.request.access}] `}${this.request.method} "${this.request.name}" not found` })
+                .error({ title: 'HTTP Request', message: `Router ${this.request.access ? `[${this.request.access}] ` : ''}${this.request.method} "${this.request.name}" not found` })
 
             return false
         }
@@ -68,7 +68,7 @@ export class EventRouter<Body = any, Res = any> {
         if (!this.handlers.length) {
             this.response
                 .status(HttpStatusCodes.NOT_IMPLEMENTED)
-                .error({ title: 'HTTP Request', message: `Router ${this.request.method} "${this.request.name}" not implemented` })
+                .error({ title: 'HTTP Request', message: `Router ${this.request.access ? `[${this.request.access}] ` : ''}${this.request.method} "${this.request.name}" not implemented` })
 
             return false
         }
