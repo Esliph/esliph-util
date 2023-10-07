@@ -35,7 +35,7 @@ export class ResultException<T = any> extends Error implements ResultExceptionMo
     }
 
     getError() {
-        return { ...this.error, status: this.status }
+        return { descriptions: this.getStack() || '', ...this.error, status: this.status }
     }
     getTitle() {
         return this.error.title

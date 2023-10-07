@@ -4,6 +4,7 @@ import { Request } from '../handler/request'
 import { Response } from '../handler/response'
 import { HandlerRouter } from '../model'
 import { ObserverServerEmitter } from '../observer'
+import { ResultException } from '../../exception'
 
 export class EventRouter<Body = any, Res = any> {
     private readonly observer: ObserverServerEmitter
@@ -121,12 +122,16 @@ export class EventRouter<Body = any, Res = any> {
 
     private handlerPerformedWithError(err: any) {
         if (err instanceof Result) {
-            this.response.status(err.getStatus()).error(err.getError())
-        } else {
-            this.response
-                .status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
-                .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
+            return this.response.status(err.getStatus()).error(err.getError())
         }
+
+        if (err instanceof ResultException) {
+            return this.response.status(err.getStatus()).error(err.getError())
+        }
+
+        return this.response
+            .status(HttpStatusCodes.INTERNAL_SERVER_ERROR)
+            .error({ title: 'HTTP Request', message: 'Server internal error', causes: [{ message: err.message, origin: err.stack }] })
     }
 
     private notResponseHandlers() {
