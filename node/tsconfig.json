@@ -1,12 +1,8 @@
 {
     "compilerOptions": {
-        "lib": [
-            "ES6"
-        ],
+        "lib": ["ES6"],
         "moduleResolution": "node",
-        "types": [
-            "node"
-        ],
+        "types": ["node"],
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
@@ -21,11 +17,7 @@
         "removeComments": true,
         "sourceMap": false,
         "outDir": "./dist",
-        "resolveJsonModule": true,
+        "resolveJsonModule": true
     },
-    "exclude": [
-        "./dist",
-        "./src/@test",
-        "./src/test"
-    ]
+    "exclude": ["./dist", "./src/@test", "./src/test"]
 }

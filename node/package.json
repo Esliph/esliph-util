@@ -11,6 +11,7 @@
         "dev:console": "tsx watch src/test/console.ts",
         "dev:observer": "tsx watch src/test/observer.ts",
         "dev:http": "tsx watch src/test/http.ts",
+        "dev:injection": "tsx watch src/test/injection.ts",
         "dev:exception": "tsx watch src/test/exception.ts",
         "dev:repository": "tsx watch src/test/repository.ts",
         "rebuild": "rm -r dist --force && npx tsc",
@@ -52,10 +53,12 @@
         "typescript": "^5.0.4"
     },
     "dependencies": {
+        "@types/reflect-metadata": "^0.1.0",
         "bcryptjs": "^2.4.3",
         "crypto": "^1.0.1",
         "dotenv": "^16.0.3",
         "lodash": "^4.17.21",
+        "reflect-metadata": "^0.1.13",
         "uuid": "^9.0.0"
     }
 }
