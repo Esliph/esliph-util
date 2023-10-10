@@ -12,6 +12,7 @@
         "dev:observer": "tsx watch src/test/observer.ts",
         "dev:http": "tsx watch src/test/http.ts",
         "dev:injection": "tsx watch src/test/injection.ts",
+        "dev:metadata": "tsx watch src/test/metadata.ts",
         "dev:exception": "tsx watch src/test/exception.ts",
         "dev:repository": "tsx watch src/test/repository.ts",
         "rebuild": "rm -r dist --force && npx tsc",
