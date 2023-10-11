@@ -6,21 +6,25 @@ export type ClassConstructor = new (...args: any[]) => any
 export class Metadata {
     private constructor() {}
 
+    static Reflect = Reflect
+
     static Create = {
-        Class: (options: DecoratorOptions, constructor: any) => Reflect.defineMetadata(options.key, options.value || null, constructor),
-        Attribute: (options: DecoratorOptions, target: any, key: string) => Reflect.defineMetadata(options.key, options.value || null, target, key),
-        Method: (options: DecoratorOptions, target: any, key: string) => Reflect.defineMetadata(options.key, options.value || null, target, key),
+        Class: (options: DecoratorOptions, constructor: any) => Metadata.Reflect.defineMetadata(Symbol.for(options.key), options.value || null, constructor),
+        Attribute: (options: DecoratorOptions, target: any, key: string) =>
+            Metadata.Reflect.defineMetadata(Symbol.for(options.key), options.value || null, target, key),
+        Method: (options: DecoratorOptions, target: any, key: string) =>
+            Metadata.Reflect.defineMetadata(Symbol.for(options.key), options.value || null, target, key),
         Parameter: (options: DecoratorOptions & { index: number }, target: any, key: string) =>
-            Reflect.defineMetadata(`${options.key}:${options.index}`, options.value || null, target, key),
+            Metadata.Reflect.defineMetadata(Symbol.for(`${options.key}:${options.index}`), options.value || null, target, key),
     }
 
     static Get = {
-        Class: <T>(key: string, classConstructor: ClassConstructor) => Reflect.getMetadata(key, classConstructor) as T,
+        Class: <T>(key: string, classConstructor: ClassConstructor) => Metadata.Reflect.getMetadata(Symbol.for(key), classConstructor) as T,
         Attribute: <T>(key: string, classConstructor: ClassConstructor, keyProperty: string) =>
-            Reflect.getMetadata(key, classConstructor.prototype, keyProperty) as T,
+            Metadata.Reflect.getMetadata(Symbol.for(key), classConstructor.prototype, keyProperty) as T,
         Method: <T>(key: string, classConstructor: ClassConstructor, keyProperty: string) =>
-            Reflect.getMetadata(key, classConstructor.prototype, keyProperty) as T,
-        Parameter: <T>(key: string, classConstructor: ClassConstructor, keyProperty: string) =>
-            Reflect.getMetadata(key, classConstructor.prototype, keyProperty) as T,
+            Metadata.Reflect.getMetadata(Symbol.for(key), classConstructor.prototype, keyProperty) as T,
+        Parameter: <T>(key: string, classConstructor: ClassConstructor, keyProperty: string, order?: number) =>
+            Metadata.Reflect.getMetadata(Symbol.for(typeof order != 'undefined' ? `${key}:${order}` : `${key}`), classConstructor.prototype, keyProperty) as T,
     }
 }

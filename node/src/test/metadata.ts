@@ -19,23 +19,7 @@ function Parameter(value?: any) {
 
 @Class()
 class ABC {
-    constructor(a, @Parameter('B') b) {}
+    abc(@Parameter('B') b) {}
 }
 
-console.log(Reflect.getMetadata('design:paramtypes', ABC))
-
-class MathClass {
-    @LogParamTypes()
-    multiply(numA: number, numB: number): number {
-        return numA * numB
-    }
-}
-
-function LogParamTypes() {
-    return LogParamTypesFactory
-}
-
-function LogParamTypesFactory(target, propertyName, descriptor) {
-    const paramTypes = Reflect.getMetadata('design:paramtypes', target, propertyName)
-    console.log('paramTypes:', paramTypes)
-}
+console.log(Metadata.Get.Parameter('param', ABC, 'abc', 0))

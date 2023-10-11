@@ -4,6 +4,13 @@ import 'reflect-metadata'
 
 export type DecoratorMetadataOptions = DecoratorOptions & { value: any | ((...args: any[]) => any) }
 
+export enum DEFAULT_KEYS {
+    CLASS = 'default:class',
+    ATTRIBUTE = 'default:attribute',
+    METHOD = 'default:method',
+    PARAMETER = 'default:parameter',
+}
+
 export class DecoratorMetadata {
     private constructor() {}
 
@@ -13,8 +20,8 @@ export class DecoratorMetadata {
                 constructor =>
                     Metadata.Create.Class(
                         {
-                            key: options.key || 'default:class',
-                            value: typeof options.value != 'function' ? options.value : options.value(constructor),
+                            key: options.key || DEFAULT_KEYS.CLASS,
+                            value: DecoratorMetadata.getValue(options.value, constructor),
                         },
                         constructor
                     ),
@@ -25,8 +32,8 @@ export class DecoratorMetadata {
                 (target, key) =>
                     Metadata.Create.Attribute(
                         {
-                            key: options.key || 'default:attribute',
-                            value: typeof options.value != 'function' ? options.value : options.value(target, key),
+                            key: options.key || DEFAULT_KEYS.ATTRIBUTE,
+                            value: DecoratorMetadata.getValue(options.value, target, key),
                         },
                         target,
                         key
@@ -38,8 +45,8 @@ export class DecoratorMetadata {
                 (target, key) =>
                     Metadata.Create.Method(
                         {
-                            key: options.key || 'default:method',
-                            value: typeof options.value != 'function' ? options.value : options.value(target, key),
+                            key: options.key || DEFAULT_KEYS.METHOD,
+                            value: DecoratorMetadata.getValue(options.value, target, key),
                         },
                         target,
                         key
@@ -51,8 +58,8 @@ export class DecoratorMetadata {
                 (target, propertyKey, parameterIndex) =>
                     Metadata.Create.Parameter(
                         {
-                            key: options.key || 'default:parameter',
-                            value: typeof options.value != 'function' ? options.value : options.value(target, propertyKey, parameterIndex),
+                            key: options.key || DEFAULT_KEYS.PARAMETER,
+                            value: DecoratorMetadata.getValue(options.value, target, propertyKey, parameterIndex),
                             index: parameterIndex,
                         },
                         target,
@@ -60,5 +67,9 @@ export class DecoratorMetadata {
                     ),
                 ...handlers
             ),
+    }
+
+    private static getValue(value: any | ((...args: any[]) => any), ...args: any[]) {
+        return typeof value != 'function' ? value : value(...args)
     }
 }
