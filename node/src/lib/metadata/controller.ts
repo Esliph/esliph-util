@@ -4,7 +4,7 @@ import 'reflect-metadata'
 export type ClassConstructor<T = any> = new (...args: any[]) => T
 
 export class Metadata {
-    private constructor() {}
+    private constructor() { }
 
     static Reflect = Reflect
 
@@ -14,7 +14,7 @@ export class Metadata {
             Metadata.Reflect.defineMetadata(Symbol.for(options.key), options.value || null, target, key),
         Method: (options: DecoratorOptions, target: any, key: string) =>
             Metadata.Reflect.defineMetadata(Symbol.for(options.key), options.value || null, target, key),
-        Parameter: (options: DecoratorOptions & { index: number }, target: any, key: string) =>
+        Parameter: (options: DecoratorOptions & { index?: number }, target?: any, key: string | symbol = '') =>
             Metadata.Reflect.defineMetadata(Symbol.for(`${options.key}:${options.index}`), options.value || null, target, key),
     }
 

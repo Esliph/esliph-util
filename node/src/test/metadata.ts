@@ -19,7 +19,7 @@ function Parameter(value?: any) {
 
 @Class()
 class ABC {
-    abc(@Parameter('B') b) {}
+    abc(@Parameter('B') b: any) { }
 }
 
 console.log(Metadata.Get.Parameter('param', ABC, 'abc', 0))

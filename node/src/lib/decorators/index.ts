@@ -1,7 +1,7 @@
-export function ClassDecorator(constructor: any) {}
-export function AttributeDecorator(target: any, key: string) {}
-export function MethodDecorator(target: any, key: string, descriptor: PropertyDescriptor) {}
-export function ParameterDecorator(target: any, propertyKey: string, parameterIndex: number) {}
+export function ClassDecorator(constructor: any) { }
+export function AttributeDecorator(target: any, key: string) { }
+export function MethodDecorator(target: any, key: string, descriptor: PropertyDescriptor) { }
+export function ParameterDecorator(target: any, propertyKey?: string | symbol, parameterIndex?: number) { }
 
 export type ClassDecoratorType = typeof ClassDecorator
 export type AttributeDecoratorType = typeof AttributeDecorator
@@ -11,7 +11,7 @@ export type ParameterDecoratorType = typeof ParameterDecorator
 export type DecoratorOptions = { value: any; key: string }
 
 export class Decorator {
-    private constructor() {}
+    private constructor() { }
 
     static Class = ClassDecorator
     static Attribute = AttributeDecorator
@@ -41,7 +41,7 @@ export class Decorator {
             }
         },
         Parameter: (...handlers: ParameterDecoratorType[]) => {
-            return (target: any, propertyKey: string, parameterIndex: number) => {
+            return (target: any, propertyKey?: string | symbol, parameterIndex?: number) => {
                 handlers.map(handler => handler(target, propertyKey, parameterIndex))
 
                 return Decorator.Parameter(target, propertyKey, parameterIndex)
