@@ -1,7 +1,7 @@
 import { DecoratorOptions } from '../decorators'
 import 'reflect-metadata'
 
-export type ClassConstructor = new (...args: any[]) => any
+export type ClassConstructor<T = any> = new (...args: any[]) => T
 
 export class Metadata {
     private constructor() {}
