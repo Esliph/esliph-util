@@ -6,6 +6,7 @@ export class Injection {
     static Injectable = Injectable
     static InjectableService = AddService
     static Inject = Inject
+    static getInstance = getInstance
     static resolve<T extends ClassConstructor>(classConstructor: T) {
         return Resolve<T>(classConstructor)
     }
@@ -14,14 +15,14 @@ export class Injection {
 function Injectable(key?: string) {
     const handler = key
         ? (constructor: any) => {
-              AddService(key, constructor)
+            AddService(key, constructor)
 
-              return DecoratorMetadata.Create.Class({
-                  key: `class.injectable.${key}`,
-                  value: (constructor: any) => constructor,
-              })
-          }
-        : () => {}
+            return DecoratorMetadata.Create.Class({
+                key: `class.injectable.${key}`,
+                value: (constructor: any) => constructor,
+            })
+        }
+        : () => { }
 
     return DecoratorMetadata.Create.Class({ key: 'class.injectable', value: true }, handler)
 }
@@ -31,9 +32,13 @@ function AddService(key: string, service: ClassConstructor) {
 }
 
 function Inject(key: string) {
-    function handler(target: any, propertyKey: string, parameterIndex: number) {
+    function handler(target: any, propertyKey?: string | symbol, parameterIndex?: number) {
         if (typeof target.prototype.Injections == 'undefined') {
             target.prototype.Injections = {}
+        }
+
+        if (typeof parameterIndex == 'undefined') {
+            throw new Error(`Parameter in ${target.name} cannot be undefined`)
         }
 
         target.prototype.Injections[parameterIndex] = key
@@ -59,11 +64,21 @@ function Resolve<T extends ClassConstructor>(classConstructor: T): InstanceType<
         return { index: Number(index), service: InjectionRepository.get(serviceName), value: null }
     })
 
-    const instancesOrdened = instances.sort((a, b) => a.index - b.index)
+    const instancesOrdered = instances.sort((a, b) => a.index - b.index)
 
-    instancesOrdened.map(({ service }, i) => {
-        instancesOrdened[i].value = Resolve(service)
+    instancesOrdered.map(({ service }, i) => {
+        instancesOrdered[i].value = Resolve(service)
     })
 
-    return new classConstructor(...instancesOrdened.map(({ value }) => value))
+    return new classConstructor(...instancesOrdered.map(({ value }) => value))
+}
+
+function getInstance<T>(key: string) {
+    const Instance = InjectionRepository.get<T>(key)
+
+    if (typeof Instance == 'undefined') {
+        throw new Error(`Service name ${key} not found`)
+    }
+
+    return Resolve(Instance)
 }
