@@ -46,6 +46,6 @@ export class Response<Res = any> {
     }
 
     hasResponse() {
-        return !!this.state.error || !!this.state.value
+        return (typeof this.state.error != 'undefined' && this.state.error != null) || (typeof this.state.value != 'undefined' && this.state.value != null)
     }
 }
