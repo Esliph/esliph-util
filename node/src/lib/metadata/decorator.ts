@@ -1,6 +1,5 @@
 import { Decorator, DecoratorOptions, ClassDecoratorType, AttributeDecoratorType, ParameterDecoratorType, MethodDecoratorType } from '../decorators'
 import { Metadata } from './controller'
-import 'reflect-metadata'
 
 export type DecoratorMetadataOptions = DecoratorOptions & { value: any | ((...args: any[]) => any) }
 

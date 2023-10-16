@@ -1,5 +1,6 @@
 import { DecoratorMetadata, Metadata } from '../lib/metadata'
-import 'reflect-metadata'
+
+const metadata = new Metadata()
 
 function Class(value?: any) {
     return DecoratorMetadata.Create.Class({ value, key: 'class' })
@@ -17,9 +18,10 @@ function Parameter(value?: any) {
     return DecoratorMetadata.Create.Parameter({ value, key: 'param' })
 }
 
-@Class()
+@Class('Class')
 class ABC {
-    abc(@Parameter('B') b: any) { }
+    abc(@Parameter('Parameter') b: any) {}
 }
 
-console.log(Metadata.Get.Parameter('param', ABC, 'abc', 0))
+Metadata.Get.Class('class', ABC)
+metadata.Get.Parameter('param', ABC, 'abc', 0)
