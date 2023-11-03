@@ -34,4 +34,14 @@ async function App() {
     console.log('!!')
 }
 
-App()
+// App()
+
+class MyClass {
+
+    @OnEvent('teste')
+    on(data) {
+        console.log(data)
+    }
+}
+
+new ObserverEmitter().emit('teste', { hello: 'Hello World' })

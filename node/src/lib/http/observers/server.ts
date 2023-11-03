@@ -22,6 +22,10 @@ export class Server<ContextEvents extends EventsModel> extends ObserverServerLis
         }
     }
 
+    resetOptions() {
+        this.requestOptions = { access: '', context: '', module: '' }
+    }
+
     use(requestOptions: Partial<ServerOption> = {}) {
         this.requestOptions = deepMerge({}, this.requestOptions, requestOptions)
     }

@@ -1,6 +1,7 @@
-import { Server } from '../lib/http/server/observers/server'
-import { Client } from '../lib/http/server/observers/client'
-import { EventsRouter } from '../lib/http/server/events'
+import { Server } from '../lib/http/observers/server'
+import { Client } from '../lib/http/observers/client'
+import { EventsRouter } from '../lib/http/events'
+import { Get } from '../lib/http'
 
 type EventsPublic = {
     'GET': {
@@ -43,9 +44,17 @@ async function App() {
     const server = new Server<EventsPublic>({ access: 'Teste' })
     const client = new Client<EventsPublic>({ access: 'Teste' })
 
-    server.get('hello', ({ body }, res) => {
-        res.send({ world: body.hello })
-    })
+    class MyClass {
+
+        @Get('hello', { access: 'Teste' })
+        perform({ body }, res) {
+            res.send({ world: body.hello })
+        }
+    }
+
+    // server.get('hello', ({ body }, res) => {
+    //     res.send({ world: body.hello })
+    // })
 
     const response = await client.get('hello', { hello: 'test' }, { access: 'Teste' })
 }
