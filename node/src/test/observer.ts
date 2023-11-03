@@ -1,4 +1,4 @@
-import { ObserverListener, ObserverEmitter } from '../lib/observer'
+import { ObserverListener, ObserverEmitter, OnEvent } from '../lib/observer'
 
 type Events = {
     'hello': { delay: number; awaiter?: boolean }
