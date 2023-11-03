@@ -1,4 +1,45 @@
 import { RelationOperatorByType } from '../constants'
+import { Decorator } from '../../../decorators'
+
+function ValidParams(...params: { notArr?: boolean; index: number }[]) {
+    function handler(target: any, key: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value
+
+        descriptor.value = function (...args: any[]) {
+            for (let i = 0; i < params.length; i++) {
+                if (!params[i].notArr) {
+                    if (!args[params[i].index].length) {
+                        return false
+                    }
+                } else {
+                    if (typeof args[params[i].index] == 'undefined') {
+                        return false
+                    }
+                }
+            }
+
+            const result = originalMethod.apply(this, args)
+
+            return result
+        }
+    }
+
+    return Decorator.Create.Method(handler)
+}
+
+function TransformValueParams() {
+    function handler(target: any, key: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value
+
+        descriptor.value = function (...args: any[]) {
+            const result = originalMethod.apply(this, args)
+
+            return result
+        }
+    }
+
+    return Decorator.Create.Method(handler)
+}
 
 export class OperatorArrayFunctions {
     static readonly OPERATORS_FUNCTION: Partial<{ [x in keyof (typeof RelationOperatorByType)['Array']]?: (value: any, valueOperator: any) => boolean }> = {
@@ -14,8 +55,8 @@ export class OperatorArrayFunctions {
         endsWith: OperatorArrayFunctions.endsWith,
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { index: 1 })
     private static hasSome(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
@@ -26,8 +67,8 @@ export class OperatorArrayFunctions {
         return false
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { index: 1 })
     private static hasEvery(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (!OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
@@ -38,8 +79,8 @@ export class OperatorArrayFunctions {
         return true
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { index: 1 })
     private static hasNotEvery(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
@@ -50,8 +91,8 @@ export class OperatorArrayFunctions {
         return true
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 1 })
     private static hasNotSome(value: any, valueOperator: any) {
         for (let i = 0; i < valueOperator.length; i++) {
             if (!OperatorArrayFunctions.validValudInArray(valueOperator[i], value)) {
@@ -62,14 +103,14 @@ export class OperatorArrayFunctions {
         return false
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { notArr: true, index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { notArr: true, index: 1 })
     private static has(value: any, valueOperator: any) {
         return OperatorArrayFunctions.validValudInArray(valueOperator, value)
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ notArr: true, index: 1 })
+    @TransformValueParams()
+    @ValidParams({ notArr: true, index: 1 })
     private static hasNot(value: any, valueOperator: any) {
         if (!valueOperator) {
             return false
@@ -78,18 +119,18 @@ export class OperatorArrayFunctions {
         return !OperatorArrayFunctions.validValudInArray(valueOperator, value)
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
+    @TransformValueParams()
     private static count(value: any, valueOperator: any) {
         return value.length == valueOperator
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
+    @TransformValueParams()
     private static isEmpty(value: any, valueOperator: any) {
         return valueOperator ? !value.length : !!value.length
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { index: 1 })
     private static startsWith(value: any, valueOperator: any) {
         if (value.length < valueOperator.length) {
             return false
@@ -107,8 +148,8 @@ export class OperatorArrayFunctions {
         return true
     }
 
-    @OperatorArrayFunctions.TransformValueParams()
-    @OperatorArrayFunctions.ValidParams({ index: 0 }, { index: 1 })
+    @TransformValueParams()
+    @ValidParams({ index: 0 }, { index: 1 })
     private static endsWith(value: any, valueOperator: any) {
         if (value.length < valueOperator.length) {
             return false
@@ -135,45 +176,5 @@ export class OperatorArrayFunctions {
             }
         }
         return false
-    }
-
-    private static ValidParams(...params: { notArr?: boolean; index: number }[]) {
-        return function (target: any, key: string, descriptor: PropertyDescriptor) {
-            const originalMethod = descriptor.value
-
-            descriptor.value = function (...args: any[]) {
-                for (let i = 0; i < params.length; i++) {
-                    if (!params[i].notArr) {
-                        if (!args[params[i].index].length) {
-                            return false
-                        }
-                    } else {
-                        if (typeof args[params[i].index] == 'undefined') {
-                            return false
-                        }
-                    }
-                }
-
-                const result = originalMethod.apply(this, args)
-
-                return result
-            }
-
-            return descriptor
-        }
-    }
-
-    private static TransformValueParams() {
-        return function (target: any, key: string, descriptor: PropertyDescriptor) {
-            const originalMethod = descriptor.value
-
-            descriptor.value = function (...args: any[]) {
-                const result = originalMethod.apply(this, args)
-
-                return result
-            }
-
-            return descriptor
-        }
     }
 }

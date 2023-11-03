@@ -1,4 +1,30 @@
 import { RelationOperatorByType } from '../constants'
+import { Decorator } from '../../../decorators'
+
+function TransformValueParams(config?: { toString?: boolean }) {
+    function handler(target: any, key: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value
+
+        descriptor.value = function (...args: any[]) {
+            if (config?.toString) {
+                args[0] = `${args[0]}`
+                args[1] = `${args[1]}`
+            } else {
+                args[0] = Number(args[0])
+                args[1] = Number(args[1])
+                if (isNaN(args[0]) || isNaN(args[1])) {
+                    return false
+                }
+            }
+
+            const result = originalMethod.apply(this, args)
+
+            return result
+        }
+    }
+
+    return Decorator.Create.Method(handler)
+}
 
 export class OperatorNumberFunctions {
     static readonly OPERATORS_FUNCTION: Partial<{ [x in keyof (typeof RelationOperatorByType)['Number']]?: (value: any, valueOperator: any) => boolean }> = {
@@ -16,27 +42,27 @@ export class OperatorNumberFunctions {
         between: OperatorNumberFunctions.between,
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static contains(value: any, valueOperator: any) {
         return value.includes(valueOperator)
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static biggerOrEqualsThat(value: any, valueOperator: any) {
         return value >= valueOperator
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static lessOrEqualsThat(value: any, valueOperator: any) {
         return value <= valueOperator
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static biggerThat(value: any, valueOperator: any) {
         return value > valueOperator
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static lessThat(value: any, valueOperator: any) {
         return value < valueOperator
     }
@@ -55,27 +81,27 @@ export class OperatorNumberFunctions {
         return true
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static notContains(value: any, valueOperator: any) {
         return !value.includes(valueOperator)
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static equals(value: any, valueOperator: any) {
         return value == valueOperator
     }
 
-    @OperatorNumberFunctions.TransformValueParams()
+    @TransformValueParams()
     private static different(value: any, valueOperator: any) {
         return value != valueOperator
     }
 
-    @OperatorNumberFunctions.TransformValueParams({ toString: true })
+    @TransformValueParams({ toString: true })
     private static startsWith(value: any, valueOperator: any) {
         return `${value}`.startsWith(`${valueOperator}`)
     }
 
-    @OperatorNumberFunctions.TransformValueParams({ toString: true })
+    @TransformValueParams({ toString: true })
     private static endsWith(value: any, valueOperator: any) {
         return `${value}`.endsWith(`${valueOperator}`)
     }
@@ -85,30 +111,5 @@ export class OperatorNumberFunctions {
             return !!`${value}`
         }
         return typeof `${value}` == 'undefined' || !`${value}`
-    }
-
-    private static TransformValueParams(config?: { toString?: boolean }) {
-        return function (target: any, key: string, descriptor: PropertyDescriptor) {
-            const originalMethod = descriptor.value
-
-            descriptor.value = function (...args: any[]) {
-                if (config?.toString) {
-                    args[0] = `${args[0]}`
-                    args[1] = `${args[1]}`
-                } else {
-                    args[0] = Number(args[0])
-                    args[1] = Number(args[1])
-                    if (isNaN(args[0]) || isNaN(args[1])) {
-                        return false
-                    }
-                }
-
-                const result = originalMethod.apply(this, args)
-
-                return result
-            }
-
-            return descriptor
-        }
     }
 }

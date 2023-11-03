@@ -1,4 +1,19 @@
 import { RelationOperatorByType } from '../constants'
+import { Decorator } from '../../../decorators'
+
+function TransformValueParams() {
+    function handler(target: any, key: string, descriptor: PropertyDescriptor) {
+        const originalMethod = descriptor.value
+
+        descriptor.value = function (...args: any[]) {
+            const result = originalMethod.apply(this, args)
+
+            return result
+        }
+    }
+
+    return Decorator.Create.Method(handler)
+}
 
 export class OperatorBooleanFunctions {
     static readonly OPERATORS_FUNCTION: Partial<{ [x in keyof (typeof RelationOperatorByType)['Boolean']]?: (value: any, valueOperator: any) => boolean }> = {
@@ -7,35 +22,21 @@ export class OperatorBooleanFunctions {
         different: OperatorBooleanFunctions.different,
     }
 
-    @OperatorBooleanFunctions.TransformValueParams()
+    @TransformValueParams()
     private static equals(value: any, valueOperator: any) {
         return value == valueOperator
     }
 
-    @OperatorBooleanFunctions.TransformValueParams()
+    @TransformValueParams()
     private static different(value: any, valueOperator: any) {
         return value != valueOperator
     }
 
-    @OperatorBooleanFunctions.TransformValueParams()
+    @TransformValueParams()
     private static filled(value: any, valueOperator: any) {
         if (valueOperator) {
             return !!value
         }
         return typeof value == 'undefined' || !value
-    }
-
-    private static TransformValueParams() {
-        return function (target: any, key: string, descriptor: PropertyDescriptor) {
-            const originalMethod = descriptor.value
-
-            descriptor.value = function (...args: any[]) {
-                const result = originalMethod.apply(this, args)
-
-                return result
-            }
-
-            return descriptor
-        }
     }
 }
