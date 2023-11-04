@@ -1,5 +1,3 @@
-import 'dotenv/config'
-
 export type GetEnvArgs<DefaultType> = { name: string, defaultValue?: DefaultType, forceDefaultValue?: boolean, defaultValueInProduction?: boolean }
 
 export function getEnv<DefaultType>({ name, defaultValue, forceDefaultValue = false, defaultValueInProduction = false }: GetEnvArgs<DefaultType>) {

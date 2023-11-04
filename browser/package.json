@@ -41,7 +41,6 @@
         "@babel/preset-env": "^7.21.5",
         "@babel/preset-typescript": "^7.21.5",
         "@types/bcryptjs": "^2.4.2",
-        "@types/dotenv": "^8.2.0",
         "@types/lodash": "^4.14.195",
         "@types/node": "^20.2.1",
         "@types/uuid": "^9.0.1",
@@ -53,7 +52,6 @@
     "dependencies": {
         "bcryptjs": "^2.4.3",
         "crypto": "^1.0.1",
-        "dotenv": "^16.0.3",
         "lodash": "^4.17.21",
         "uuid": "^9.0.0"
     }
